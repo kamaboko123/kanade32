@@ -7,20 +7,25 @@ module RAM(
 );
 
 reg [29:0] _address;
-reg [31:0] _rom [255:0];
+reg [31:0] _ram [255:0];
 
-initial $readmemh("test_c/memdata/fibonacci.mem", _rom);
+//initial $readmemh("test_c/memdata/fibonacci.mem", _ram);
+
+initial begin
+    _ram[0] = 32'h20080020;
+    _ram[1] = 32'h00000000;
+end
 
 always @(posedge clk) begin
     _address <= address;
     if(wren) begin
-        _rom[address] <= data;
+        _ram[address] <= data;
     end
 end
 
 wire [31:0] debug;
-assign debug = _rom[1];
-assign q = _rom[_address];
+assign debug = _ram[1];
+assign q = _ram[_address];
 
 endmodule
 
