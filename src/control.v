@@ -4,10 +4,11 @@ module CONTROL(
     input reset_n,
     input clk,
     output reg pc_wren,
-    output reg pc_rden,
+    output reg ram_addr_src, //0=pc, 1=alu_result
     output reg fd_wren,
     output reg de_wren,
-    output reg em_wren
+    output reg em_wren,
+    output reg mw_wren
 );
 
 reg [4:0] state;
@@ -31,6 +32,9 @@ always @(posedge clk) begin
             state <= `STATE_EXECUTE;
         end
         `STATE_EXECUTE: begin
+            state <= `STATE_MEM;
+        end
+        `STATE_MEM: begin
             state <= `STATE_NEXT_INS;
         end
         `STATE_NEXT_INS: begin
@@ -41,7 +45,7 @@ end
 
 always @(state) begin
     pc_wren = 0;
-    pc_rden = 0;
+    ram_addr_src = 0;
     
     fd_wren = 0;
     de_wren = 0;
@@ -50,10 +54,8 @@ always @(state) begin
         `STATE_INIT:begin
         end
         `STATE_FETCH:begin
-            pc_rden = 1;
         end
         `STATE_FETCH_WAIT:begin
-            pc_rden = 1;
             fd_wren = 1;
         end
         `STATE_DECODE:begin
@@ -61,6 +63,11 @@ always @(state) begin
         end
         `STATE_EXECUTE:begin
             em_wren = 1;
+        end
+        `STATE_MEM:begin
+            ram_addr_src = 1;
+            mw_wren = 1;
+            pc_wren = 1;
         end
         `STATE_NEXT_INS:begin
             pc_wren = 1;

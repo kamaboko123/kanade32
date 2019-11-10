@@ -150,19 +150,36 @@ end
 
 endmodule
 
+// STAGE REGISTER
+// Betwenn MEM(memory access) and WB(write back)
+module STAGE_REG_MW(
+    input reset_n,
+    input clk,
+    input wren,
+    input in_dec_mem_to_reg
+);
+
+always @(posedge clk) begin
+    if(!reset_n) begin
+    end
+    else if(wren) begin
+    end
+end
+endmodule
+
+
 
 module PC(
     input reset_n,
     input clk,
     input wren,
-    input rden,
     input [31:0] jmp_to,
     output [31:0] pc_data
 );
 
 reg [31:0] _pc_data;
 
-assign pc_data = (rden == 0) ? (32'bz): (_pc_data);
+assign pc_data = _pc_data;
 
 always @(posedge clk) begin
     if(!reset_n) begin

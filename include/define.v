@@ -3,6 +3,7 @@
 `define STATE_FETCH_WAIT 5'h2
 `define STATE_DECODE 5'h3
 `define STATE_EXECUTE 5'h4
+`define STATE_MEM 5'h5
 `define STATE_NEXT_INS 5'h9
 
 `define ALU_OP_AND 3'b000

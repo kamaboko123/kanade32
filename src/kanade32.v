@@ -4,10 +4,14 @@ module KANADE32(
 );
 
 wire pc_wren;
-wire pc_rden;
 
 //control fetch
 wire fd_wren;
+wire ram_addr_src;
+
+//datapath ram access
+wire [31:0] ram_addr;
+assign ram_addr = (ram_addr_src == 0) ? (pc_data) : (mw_alu_result);
 
 //datatpath fetch -> decode
 wire [31:0] pc_data;
@@ -65,14 +69,39 @@ wire [31:0] em_branch_pc;
 wire [31:0] em_alu_result;
 
 
+//control memory access
+wire mw_wren;
+wire mw_alu_result_zero;
+wire mw_dec_mem_read;
+wire mw_dec_mem_write;
+wire mw_dec_branch;
+wire mw_dec_jmp;
+
+wire mw_pc_src;
+assign mw_pc_src = (mw_dec_brnach & mw_alu_result_zero);
+
+//control memory access -> write back
+wire mw_dec_mem_to_reg;
+wire mw_dec_reg_write;
+
+//datapath memory access
+wire [31:0] mw_next_pc;
+wire [31:0] mw_branch_pc;
+wire [31:0] mw_alu_result;
+wire [31:0] mw_pc;
+
+assign mw_pc = (mw_pc_src == 0) ? (mw_next_pc) : (mw_branch_pc);
+
+
 CONTROL ctrl(
     .reset_n(reset_n),
     .clk(clk),
     .pc_wren(pc_wren),
-    .pc_rden(pc_rden),
+    .ram_addr_src(ram_addr_src),
     .fd_wren(fd_wren),
     .de_wren(de_wren),
-    .em_wren(em_wren)
+    .em_wren(em_wren),
+    .mw_wren(mw_wren)
 );
 
 STAGE_REG_FD fd(
@@ -80,7 +109,7 @@ STAGE_REG_FD fd(
     .clk(clk),
     .wren(fd_wren),
     .in_ins(ins_data),
-    .in_next_pc(pc_data_inc),
+    .in_next_pc(pc_data + 4),
     .ins(fd_ins_data),
     .next_pc(fd_next_pc)
 );
@@ -131,7 +160,17 @@ STAGE_REG_EM em(
     .in_dec_mem_write(em_dec_mem_write),
     .in_dec_branch(em_dec_branch),
     .in_dec_jmp(em_dec_jmp),
-    .in_alu_result_zero(em_alu_result_zero)
+    .in_alu_result_zero(em_alu_result_zero),
+    .next_pc(mw_next_pc),
+    .branch_pc(mw_branch_pc),
+    .alu_result(mw_alu_result),
+    .dec_mem_to_reg(mw_dec_mem_to_reg),
+    .dec_reg_write(mw_dec_reg_write),
+    .dec_mem_read(mw_dec_mem_read),
+    .dec_mem_write(mw_dec_mem_write),
+    .dec_branch(mw_dec_branch),
+    .dec_jmp(mw_dec_jmp),
+    .alu_result_zero(mw_alu_result_zero)
 );
 
 
@@ -179,15 +218,14 @@ PC pc(
     .reset_n(reset_n),
     .clk(clk),
     .wren(pc_wren),
-    .rden(pc_rden),
-    .jmp_to(pc_data_inc),
+    .jmp_to(mw_pc),
     .pc_data(pc_data)
 );
-assign pc_data_inc = pc_data + 4;
+
 
 RAM ram(
     .clk(clk),
-    .address(pc_data[31:2]),
+    .address(ram_addr[31:2]),
     .q(ins_data)
 );
 
