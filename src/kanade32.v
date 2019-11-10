@@ -11,12 +11,12 @@ wire ram_addr_src;
 
 //datapath ram access
 wire [31:0] ram_addr;
-assign ram_addr = (ram_addr_src == 0) ? (pc_data) : (mw_alu_result);
+assign ram_addr = ((ram_addr_src == 1) && (mw_dec_mem_read)) ? (mw_alu_result) : (pc_data);
 
 //datatpath fetch -> decode
 wire [31:0] pc_data;
 wire [31:0] pc_data_inc;
-wire [31:0] ins_data;
+wire [31:0] ram_data;
 wire [31:0] fd_ins_data;
 wire [31:0] fd_next_pc;
 
@@ -62,6 +62,7 @@ wire [31:0] em_data0;
 wire [31:0] em_data1;
 assign em_data0 = em_reg0;
 assign em_data1 = (em_alu_src == 0) ? (em_reg1) : (em_imm);
+wire [4:0] em_rd_reg;
 
 //datapath execute -> memory access
 wire [31:0] em_next_pc;
@@ -76,6 +77,10 @@ wire mw_dec_mem_read;
 wire mw_dec_mem_write;
 wire mw_dec_branch;
 wire mw_dec_jmp;
+wire mw_mwm_wren;
+
+wire mem_wren;
+assign mem_wren = (mw_mem_wren & mw_dec_mem_write);
 
 wire mw_pc_src;
 assign mw_pc_src = (mw_dec_brnach & mw_alu_result_zero);
@@ -88,9 +93,10 @@ wire mw_dec_reg_write;
 wire [31:0] mw_next_pc;
 wire [31:0] mw_branch_pc;
 wire [31:0] mw_alu_result;
+wire [31:0] mw_mem_write_data;
 wire [31:0] mw_pc;
-
 assign mw_pc = (mw_pc_src == 0) ? (mw_next_pc) : (mw_branch_pc);
+wire [4:0] mw_rd_reg;
 
 
 CONTROL ctrl(
@@ -101,14 +107,15 @@ CONTROL ctrl(
     .fd_wren(fd_wren),
     .de_wren(de_wren),
     .em_wren(em_wren),
-    .mw_wren(mw_wren)
+    .mw_wren(mw_wren),
+    .mw_mem_wren(mw_mem_wren)
 );
 
 STAGE_REG_FD fd(
     .reset_n(reset_n),
     .clk(clk),
     .wren(fd_wren),
-    .in_ins(ins_data),
+    .in_ins(ram_data),
     .in_next_pc(pc_data + 4),
     .ins(fd_ins_data),
     .next_pc(fd_next_pc)
@@ -121,6 +128,7 @@ STAGE_REG_DE de(
     .in_next_pc(fd_next_pc),
     .in_data0(reg0),
     .in_data1(reg1),
+    .in_rd_reg((fd_dec_reg_dst == 0) ? (fd_ins_data[20:16]) : (fs_ins_data[15:11])),
     .in_dec_alu_src(fd_dec_alu_src),
     .in_dec_mem_to_reg(fd_dec_mem_to_reg),
     .in_dec_reg_write(fd_dec_reg_write),
@@ -136,6 +144,7 @@ STAGE_REG_DE de(
     .next_pc(em_next_pc),
     .data0(em_reg0),
     .data1(em_reg1),
+    .rd_reg(em_rd_reg),
     .imm(em_imm),
     .dec_alu_src(em_alu_src),
     .dec_alu_op(em_alu_op),
@@ -154,6 +163,8 @@ STAGE_REG_EM em(
     .in_next_pc(em_next_pc),
     .in_branch_pc(em_branch_pc),
     .in_alu_result(em_alu_result),
+    .in_mem_write_data(em_reg1),
+    .in_rd_reg(em_rd_reg),
     .in_dec_mem_to_reg(em_dec_mem_to_reg),
     .in_dec_reg_write(em_dec_reg_write),
     .in_dec_mem_read(em_dec_mem_read),
@@ -164,6 +175,8 @@ STAGE_REG_EM em(
     .next_pc(mw_next_pc),
     .branch_pc(mw_branch_pc),
     .alu_result(mw_alu_result),
+    .mem_write_data(mw_mem_write_data),
+    .rd_reg(mw_rd_reg),
     .dec_mem_to_reg(mw_dec_mem_to_reg),
     .dec_reg_write(mw_dec_reg_write),
     .dec_mem_read(mw_dec_mem_read),
@@ -179,10 +192,11 @@ REGFILE regfile(
     .clk(clk),
     .reg_wren(0),
     .r_reg0(fd_ins_data[25:21]),
-    .r_reg1((fd_dec_reg_dst == 0) ? (fd_ins_data[20:16]) : (fd_ins_data[15:11])),
+    .r_reg1(fd_ins_data[20:16]),
     .reg0(reg0),
     .reg1(reg1)
 );
+//.r_reg1((fd_dec_reg_dst == 0) ? (fd_ins_data[20:16]) : (fd_ins_data[15:11])),
 
 DECODER dec(
     .ins_op(fd_ins_data[31:26]),
@@ -226,7 +240,9 @@ PC pc(
 RAM ram(
     .clk(clk),
     .address(ram_addr[31:2]),
-    .q(ins_data)
+    .q(ram_data),
+    .data(mw_mem_write_data),
+    .wren(mem_wren)
 );
 
 endmodule

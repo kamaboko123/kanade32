@@ -13,7 +13,9 @@ reg [31:0] _ram [255:0];
 
 initial begin
     _ram[0] = 32'h20080020;
+    //_ram[0] = 32'hafbf001c;
     _ram[1] = 32'h00000000;
+    _ram[8] = 32'h11111111;
 end
 
 always @(posedge clk) begin
