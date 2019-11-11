@@ -5,6 +5,7 @@
 `define STATE_EXECUTE 5'h4
 `define STATE_MEM 5'h5
 `define STATE_MEM_WAIT 5'h6
+`define STATE_WB 5'h7
 `define STATE_NEXT_INS 5'h9
 
 `define ALU_OP_AND 3'b000

@@ -77,7 +77,7 @@ wire mw_dec_mem_read;
 wire mw_dec_mem_write;
 wire mw_dec_branch;
 wire mw_dec_jmp;
-wire mw_mwm_wren;
+wire mw_mem_wren;
 
 wire mem_wren;
 assign mem_wren = (mw_mem_wren & mw_dec_mem_write);
@@ -99,6 +99,22 @@ assign mw_pc = (mw_pc_src == 0) ? (mw_next_pc) : (mw_branch_pc);
 wire [4:0] mw_rd_reg;
 
 
+//control write back
+wire reg_wren; //control
+wire w_dec_reg_write; //stage register mw
+wire w_dec_mem_to_reg; //stage register mw
+
+wire _reg_wren;
+assign _reg_wren = (reg_wren & w_dec_reg_write);
+
+//datapath write back
+wire [31:0] w_alu_result;
+wire [31:0] w_mem_data;
+wire [4:0] w_rd_reg;
+
+wire [31:0] w_reg_write_data;
+assign w_reg_write_data = (w_dec_mem_to_reg == 0) ? (w_alu_result) : (w_mem_data);
+
 CONTROL ctrl(
     .reset_n(reset_n),
     .clk(clk),
@@ -108,7 +124,8 @@ CONTROL ctrl(
     .de_wren(de_wren),
     .em_wren(em_wren),
     .mw_wren(mw_wren),
-    .mw_mem_wren(mw_mem_wren)
+    .mw_mem_wren(mw_mem_wren),
+    .reg_wren(reg_wren)
 );
 
 STAGE_REG_FD fd(
@@ -186,13 +203,31 @@ STAGE_REG_EM em(
     .alu_result_zero(mw_alu_result_zero)
 );
 
+STAGE_REG_MW mw(
+    .reset_n(reset_n),
+    .clk(clk),
+    .wren(mw_wren),
+    .in_mem_data(ram_data),
+    .in_alu_result(mw_alu_result),
+    .in_rd_reg(mw_rd_reg),
+    .in_dec_mem_to_reg(mw_dec_mem_to_reg),
+    .in_dec_reg_write(mw_dec_reg_write),
+    .mem_data(w_mem_data),
+    .alu_result(w_alu_result),
+    .rd_reg(w_rd_reg),
+    .dec_mem_to_reg(w_dec_mem_to_reg),
+    .dec_reg_write(w_dec_reg_write)
+);
+
 
 REGFILE regfile(
     .reset_n(reset_n),
     .clk(clk),
-    .reg_wren(0),
+    .reg_wren(_reg_wren),
     .r_reg0(fd_ins_data[25:21]),
     .r_reg1(fd_ins_data[20:16]),
+    .w_reg0(w_rd_reg),
+    .w_data(w_reg_write_data),
     .reg0(reg0),
     .reg1(reg1)
 );

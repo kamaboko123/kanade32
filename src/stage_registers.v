@@ -168,13 +168,32 @@ module STAGE_REG_MW(
     input reset_n,
     input clk,
     input wren,
-    input in_dec_mem_to_reg
+    input [31:0] in_mem_data,
+    input [31:0] in_alu_result,
+    input [4:0] in_rd_reg,
+    input in_dec_mem_to_reg,
+    input in_dec_reg_write,
+    output reg [31:0] mem_data,
+    output reg [31:0] alu_result,
+    output reg [4:0] rd_reg,
+    output reg dec_mem_to_reg,
+    output reg dec_reg_write
 );
 
 always @(posedge clk) begin
     if(!reset_n) begin
+        mem_data <= 0;
+        alu_result <= 0;
+        rd_reg <= 0;
+        dec_mem_to_reg <= 0;
+        dec_reg_write <= 0;
     end
     else if(wren) begin
+        mem_data <= in_mem_data;
+        alu_result <= in_alu_result;
+        rd_reg <= in_rd_reg;
+        dec_mem_to_reg <= in_dec_mem_to_reg;
+        dec_reg_write <= in_dec_reg_write;
     end
 end
 endmodule

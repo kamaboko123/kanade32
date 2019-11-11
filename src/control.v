@@ -9,7 +9,8 @@ module CONTROL(
     output reg de_wren,
     output reg em_wren,
     output reg mw_wren,
-    output reg mw_mem_wren
+    output reg mw_mem_wren,
+    output reg reg_wren
 );
 
 reg [4:0] state;
@@ -39,9 +40,9 @@ always @(posedge clk) begin
             state <= `STATE_MEM_WAIT;
         end
         `STATE_MEM_WAIT: begin
-            state <= `STATE_NEXT_INS;
+            state <= `STATE_WB;
         end
-        `STATE_NEXT_INS: begin
+        `STATE_WB: begin
             state <= `STATE_FETCH;
         end
     endcase
@@ -56,6 +57,7 @@ always @(state) begin
     em_wren = 0;
     mw_wren = 0;
     mw_mem_wren = 0;
+    reg_wren = 0;
     
     case(state)
         `STATE_INIT:begin
@@ -79,8 +81,8 @@ always @(state) begin
             pc_wren = 1;
             mw_mem_wren = 1;
         end
-        `STATE_NEXT_INS:begin
-            pc_wren = 1;
+        `STATE_WB:begin
+            reg_wren = 1;
         end
     endcase
 end
