@@ -143,7 +143,7 @@ CONTROL ctrl(
 );
 
 STAGE_REG_FD fd(
-    .reset_n(reset_n & stage_refresh_n),
+    .reset_n(stage_refresh_n),
     .clk(clk),
     .wren(fd_wren),
     .in_ins(ram_data),
@@ -153,7 +153,7 @@ STAGE_REG_FD fd(
 );
 
 STAGE_REG_DE de(
-    .reset_n(reset_n & stage_refresh_n),
+    .reset_n(stage_refresh_n),
     .clk(clk),
     .wren(de_wren),
     .in_next_pc(fd_next_pc),
@@ -188,7 +188,7 @@ STAGE_REG_DE de(
 );
 
 STAGE_REG_EM em(
-    .reset_n(reset_n & stage_refresh_n),
+    .reset_n(stage_refresh_n),
     .clk(clk),
     .wren(em_wren),
     .in_next_pc(em_next_pc),
@@ -218,7 +218,7 @@ STAGE_REG_EM em(
 );
 
 STAGE_REG_MW mw(
-    .reset_n(reset_n & stage_refresh_n),
+    .reset_n(stage_refresh_n),
     .clk(clk),
     .wren(mw_wren),
     .in_mem_data(ram_data),

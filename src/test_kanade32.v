@@ -19,7 +19,7 @@ initial begin
     clk <= 0;
     
     #1 reset_n <= 0;
-    #(CLK * 2) reset_n <= 1;
+    #(CLK * 4) reset_n <= 1;
     
     #1000 $finish;
 end

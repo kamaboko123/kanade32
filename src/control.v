@@ -20,33 +20,35 @@ always @(posedge clk) begin
     if(!reset_n) begin
         state <= `STATE_INIT;
     end
-    case (state)
-        `STATE_INIT:begin
-            state <= `STATE_FETCH;
-        end
-        `STATE_FETCH:begin
-            state <= `STATE_FETCH_WAIT;
-        end
-        `STATE_FETCH_WAIT:begin
-            //state <= `STATE_NEXT_INS;
-            state <= `STATE_DECODE;
-        end
-        `STATE_DECODE: begin
-            state <= `STATE_EXECUTE;
-        end
-        `STATE_EXECUTE: begin
-            state <= `STATE_MEM;
-        end
-        `STATE_MEM: begin
-            state <= `STATE_MEM_WAIT;
-        end
-        `STATE_MEM_WAIT: begin
-            state <= `STATE_WB;
-        end
-        `STATE_WB: begin
-            state <= `STATE_FETCH;
-        end
-    endcase
+    else begin
+        case (state)
+            `STATE_INIT:begin
+                state <= `STATE_FETCH;
+            end
+            `STATE_FETCH:begin
+                state <= `STATE_FETCH_WAIT;
+            end
+            `STATE_FETCH_WAIT:begin
+                //state <= `STATE_NEXT_INS;
+                state <= `STATE_DECODE;
+            end
+            `STATE_DECODE: begin
+                state <= `STATE_EXECUTE;
+            end
+            `STATE_EXECUTE: begin
+                state <= `STATE_MEM;
+            end
+            `STATE_MEM: begin
+                state <= `STATE_MEM_WAIT;
+            end
+            `STATE_MEM_WAIT: begin
+                state <= `STATE_WB;
+            end
+            `STATE_WB: begin
+                state <= `STATE_FETCH;
+            end
+        endcase
+    end
 end
 
 always @(state) begin
@@ -63,6 +65,7 @@ always @(state) begin
     
     case(state)
         `STATE_INIT:begin
+            refresh_n = 0;
         end
         `STATE_FETCH:begin
         end
@@ -86,6 +89,8 @@ always @(state) begin
         `STATE_WB:begin
             reg_wren = 1;
             refresh_n = 0;
+        end
+        default:begin
         end
     endcase
 end
