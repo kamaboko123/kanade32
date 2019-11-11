@@ -10,7 +10,8 @@ module CONTROL(
     output reg em_wren,
     output reg mw_wren,
     output reg mw_mem_wren,
-    output reg reg_wren
+    output reg reg_wren,
+    output reg refresh_n
 );
 
 reg [4:0] state;
@@ -58,6 +59,7 @@ always @(state) begin
     mw_wren = 0;
     mw_mem_wren = 0;
     reg_wren = 0;
+    refresh_n = 1;
     
     case(state)
         `STATE_INIT:begin
@@ -75,14 +77,15 @@ always @(state) begin
         end
         `STATE_MEM:begin
             ram_addr_src = 1;
-        end
-        `STATE_MEM_WAIT:begin
-            mw_wren = 1;
             pc_wren = 1;
             mw_mem_wren = 1;
         end
+        `STATE_MEM_WAIT:begin
+            mw_wren = 1;
+        end
         `STATE_WB:begin
             reg_wren = 1;
+            refresh_n = 0;
         end
     endcase
 end

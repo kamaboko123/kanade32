@@ -83,7 +83,7 @@ assign regs = {
     _r0_data
 };
 
-assign _write_sel = (32'b1 << w_reg0);
+assign _write_sel = (reg_wren == 1) ? (32'b1 << w_reg0) : (32'b0);
 assign reg0 = mux_reg(r_reg0, regs);
 assign reg1 = mux_reg(r_reg1, regs);
 

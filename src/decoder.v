@@ -31,6 +31,18 @@ always @* begin
             reg_write = 1'b1;
             alu_op = `ALU_OP_ADD;
         end
+        35:begin //lw
+            alu_src = 1'b1;
+            mem_to_reg = 1'b1;
+            reg_write = 1'b1;
+            mem_read = 1'b1;
+            alu_op = `ALU_OP_ADD;
+        end
+        43: begin //sw
+            alu_src = 1'b1;
+            mem_write = 1'b1;
+            alu_op = `ALU_OP_ADD;
+        end
     endcase
 end
 

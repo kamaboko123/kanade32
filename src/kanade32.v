@@ -10,8 +10,19 @@ wire fd_wren;
 wire ram_addr_src;
 
 //datapath ram access
-wire [31:0] ram_addr;
-assign ram_addr = ((ram_addr_src == 1) && (mw_dec_mem_read)) ? (mw_alu_result) : (pc_data);
+reg [31:0] ram_addr;
+//assign ram_addr = ((ram_addr_src == 1) && (mw_dec_mem_read)) ? (mw_alu_result) : (pc_data);
+
+always @* begin
+    if(ram_addr_src == 0) begin
+        ram_addr = pc_data;
+    end
+    else begin
+        if(mw_dec_mem_read | mw_dec_mem_write) begin
+            ram_addr = mw_alu_result;
+        end
+    end
+end
 
 //datatpath fetch -> decode
 wire [31:0] pc_data;
@@ -115,6 +126,8 @@ wire [4:0] w_rd_reg;
 wire [31:0] w_reg_write_data;
 assign w_reg_write_data = (w_dec_mem_to_reg == 0) ? (w_alu_result) : (w_mem_data);
 
+wire stage_refresh_n;
+
 CONTROL ctrl(
     .reset_n(reset_n),
     .clk(clk),
@@ -125,11 +138,12 @@ CONTROL ctrl(
     .em_wren(em_wren),
     .mw_wren(mw_wren),
     .mw_mem_wren(mw_mem_wren),
-    .reg_wren(reg_wren)
+    .reg_wren(reg_wren),
+    .refresh_n(stage_refresh_n)
 );
 
 STAGE_REG_FD fd(
-    .reset_n(reset_n),
+    .reset_n(reset_n & stage_refresh_n),
     .clk(clk),
     .wren(fd_wren),
     .in_ins(ram_data),
@@ -139,7 +153,7 @@ STAGE_REG_FD fd(
 );
 
 STAGE_REG_DE de(
-    .reset_n(reset_n),
+    .reset_n(reset_n & stage_refresh_n),
     .clk(clk),
     .wren(de_wren),
     .in_next_pc(fd_next_pc),
@@ -174,7 +188,7 @@ STAGE_REG_DE de(
 );
 
 STAGE_REG_EM em(
-    .reset_n(reset_n),
+    .reset_n(reset_n & stage_refresh_n),
     .clk(clk),
     .wren(em_wren),
     .in_next_pc(em_next_pc),
@@ -204,7 +218,7 @@ STAGE_REG_EM em(
 );
 
 STAGE_REG_MW mw(
-    .reset_n(reset_n),
+    .reset_n(reset_n & stage_refresh_n),
     .clk(clk),
     .wren(mw_wren),
     .in_mem_data(ram_data),

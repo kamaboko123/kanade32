@@ -5,7 +5,7 @@ addi $t0, $t0, 32
 add $t1, $zero, 32
 sub $t0, $t0, $t1
 
-sw $t0, 8($zero)
-lw $t2, 8($zero)
+sw $t0, 64($zero)
+lw $t2, 64($zero)
 
 
