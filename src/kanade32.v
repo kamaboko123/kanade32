@@ -94,7 +94,7 @@ wire mem_wren;
 assign mem_wren = (mw_mem_wren & mw_dec_mem_write);
 
 wire mw_pc_src;
-assign mw_pc_src = (mw_dec_brnach & mw_alu_result_zero);
+assign mw_pc_src = (mw_dec_branch & mw_alu_result_zero);
 
 //control memory access -> write back
 wire mw_dec_mem_to_reg;
@@ -159,7 +159,7 @@ STAGE_REG_DE de(
     .in_next_pc(fd_next_pc),
     .in_data0(reg0),
     .in_data1(reg1),
-    .in_rd_reg((fd_dec_reg_dst == 0) ? (fd_ins_data[20:16]) : (fs_ins_data[15:11])),
+    .in_rd_reg((fd_dec_reg_dst == 0) ? (fd_ins_data[20:16]) : (fd_ins_data[15:11])),
     .in_dec_alu_src(fd_dec_alu_src),
     .in_dec_mem_to_reg(fd_dec_mem_to_reg),
     .in_dec_reg_write(fd_dec_reg_write),
