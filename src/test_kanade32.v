@@ -21,7 +21,7 @@ initial begin
     #1 reset_n <= 0;
     #(CLK * 4) reset_n <= 1;
     
-    #1000 $finish;
+    #5000 $finish;
 end
 
 KANADE32 kanade(

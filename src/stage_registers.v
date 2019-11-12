@@ -34,7 +34,7 @@ module STAGE_REG_DE(
     input [31:0] in_data0,
     input [31:0] in_data1,
     input [4:0] in_dst_reg,
-    input [31:0] in_imm,
+    input [31:0] in_ins,
     input in_dec_alu_src,
     input in_dec_mem_to_reg,
     input in_dec_reg_write,
@@ -47,7 +47,7 @@ module STAGE_REG_DE(
     output reg [31:0] data0,
     output reg [31:0] data1,
     output reg [4:0] dst_reg,
-    output reg [31:0] imm,
+    output reg [31:0] ins,
     output reg dec_alu_src,
     output reg dec_mem_to_reg,
     output reg dec_reg_write,
@@ -64,7 +64,7 @@ always @(posedge clk) begin
         data0 <= 0;
         data1 <= 0;
         dst_reg <= 0;
-        imm <= 0;
+        ins <= 0;
         
         dec_alu_src <= 0;
         dec_mem_to_reg <= 0;
@@ -80,7 +80,7 @@ always @(posedge clk) begin
         data0 <= in_data0;
         data1 <= in_data1;
         dst_reg <= in_dst_reg;
-        imm <= in_imm;
+        ins <= in_ins;
         
         dec_alu_src <= in_dec_alu_src;
         dec_mem_to_reg <= in_dec_mem_to_reg;
@@ -107,6 +107,7 @@ module STAGE_REG_EM(
     input [31:0] in_alu_result,
     input [31:0] in_mem_write_data,
     input [4:0] in_dst_reg,
+    input [31:0] in_ins,
     input in_dec_mem_to_reg,
     input in_dec_reg_write,
     input in_dec_mem_read,
@@ -119,6 +120,7 @@ module STAGE_REG_EM(
     output reg [31:0] alu_result,
     output reg [31:0] mem_write_data,
     output reg [4:0] dst_reg,
+    output reg [31:0] ins,
     output reg dec_mem_to_reg,
     output reg dec_reg_write,
     output reg dec_mem_read,
@@ -132,6 +134,7 @@ always @(posedge clk) begin
     if(!reset_n) begin
         next_pc <= 0;
         branch_pc <= 0;
+        ins <= 0;
         dec_mem_to_reg <= 0;
         dec_reg_write <= 0;
         dec_mem_read <= 0;
@@ -146,6 +149,7 @@ always @(posedge clk) begin
     else if(wren) begin
         next_pc <= in_next_pc;
         branch_pc <= in_branch_pc;
+        ins <= in_ins;
         dec_mem_to_reg <= in_dec_mem_to_reg;
         dec_reg_write <= in_dec_reg_write;
         dec_mem_read <= in_dec_mem_read;

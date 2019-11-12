@@ -26,19 +26,44 @@ always @* begin
     alu_op = 4'b000;
     
     case(ins_op)
-        8: begin //(add imm)
+        6'b000000: begin
+            case(func_code)
+                //add
+                6'b100000: begin
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_ADD;
+                end
+                //sub
+                6'b100010: begin
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_SUB;
+                end
+            endcase
+        end
+        //j
+        6'b000010: begin
+            branch = 1'b1;
+            jmp = 1'b1;
+            alu_op = `ALU_OP_OR;
+        end
+        //addi
+        6'b001000: begin
             alu_src = 1'b1;
             reg_write = 1'b1;
             alu_op = `ALU_OP_ADD;
         end
-        35:begin //lw
+        //lw
+        6'b100011:begin
             alu_src = 1'b1;
             mem_to_reg = 1'b1;
             reg_write = 1'b1;
             mem_read = 1'b1;
             alu_op = `ALU_OP_ADD;
         end
-        43: begin //sw
+        //sw
+        6'b101011: begin
             alu_src = 1'b1;
             mem_write = 1'b1;
             alu_op = `ALU_OP_ADD;

@@ -4,7 +4,12 @@ kanade32 supports some MIPS I instructions.
 ## Kanade32 Instructions
 
 ### Arithmetic
-- addi rt, rs, imm
+- addi rd, rs, rt
+- sub rd, rs, rt
+- add rd, rs, rt
+
+### Jump
+- j imm
 
 ### Memory Access
 - lw rt, offset(rs)
