@@ -14,6 +14,37 @@ wire [31:0] _write_sel;
 
 wire [31:0] _r_data[31:0];
 
+wire [31:0] debug_zero, debug_v0, debug_v1, debug_a0, debug_a1, debug_a2, debug_a3, debug_t0, debug_t1, debug_t2, debug_t3, debug_t4, debug_t5, debug_t6, debug_t7, debug_s0, debug_s1, debug_s2, debug_s3, debug_s4, debug_s5, debug_s6, debug_s7, debug_t8, debug_t9, debug_gp, debug_sp, debug_fp, debug_ra;
+assign debug_zero = _r0_data;
+assign debug_v0 = _r2_data;
+assign debug_v1 = _r3_data;
+assign debug_a0 = _r4_data;
+assign debug_a1 = _r5_data;
+assign debug_a2 = _r6_data;
+assign debug_a3 = _r7_data;
+assign debug_t0 = _r8_data;
+assign debug_t1 = _r9_data;
+assign debug_t2 = _r10_data;
+assign debug_t3 = _r11_data;
+assign debug_t4 = _r12_data;
+assign debug_t5 = _r13_data;
+assign debug_t6 = _r14_data;
+assign debug_t7 = _r15_data;
+assign debug_s0 = _r16_data;
+assign debug_s1 = _r17_data;
+assign debug_s2 = _r18_data;
+assign debug_s3 = _r19_data;
+assign debug_s4 = _r20_data;
+assign debug_s5 = _r21_data;
+assign debug_s6 = _r22_data;
+assign debug_s7 = _r23_data;
+assign debug_t8 = _r24_data;
+assign debug_t9 = _r25_data;
+assign debug_gp = _r28_data;
+assign debug_sp = _r29_data;
+assign debug_fp = _r30_data;
+assign debug_ra = _r31_data;
+
 wire [31:0] _r0_data;
 wire [31:0] _r1_data;
 wire [31:0] _r2_data;

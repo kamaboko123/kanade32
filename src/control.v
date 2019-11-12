@@ -29,7 +29,6 @@ always @(posedge clk) begin
                 state <= `STATE_FETCH_WAIT;
             end
             `STATE_FETCH_WAIT:begin
-                //state <= `STATE_NEXT_INS;
                 state <= `STATE_DECODE;
             end
             `STATE_DECODE: begin

@@ -30,6 +30,16 @@ wire [31:0] ram_data;
 wire [31:0] fd_ins_data;
 wire [31:0] fd_next_pc;
 
+reg [4:0] fd_dst_reg;
+always @* begin
+    if(fd_dec_pc_to_ra == 1) begin
+        fd_dst_reg = 5'd31; //ra register(for jal instrution)
+    end
+    else begin
+        fd_dst_reg = (fd_dec_reg_dst == 0) ? (fd_ins_data[20:16]) : (fd_ins_data[15:11]);
+    end
+end
+
 //contorl decode
 wire de_wren;
 wire fd_dec_reg_dst;
@@ -42,6 +52,7 @@ wire fd_dec_mem_read;
 wire fd_dec_mem_write;
 wire fd_dec_branch;
 wire fd_dec_jmp;
+wire fd_dec_pc_to_ra;
 wire [2:0] fd_dec_alu_op;
 
 //datapath decode -> execute
@@ -103,21 +114,29 @@ wire mw_dec_mem_to_reg;
 wire mw_dec_reg_write;
 
 //datapath memory access
-wire [31:0] mw_next_pc;
+wire [31:0] _mw_next_pc;
 wire [31:0] mw_branch_pc;
 wire [31:0] mw_alu_result;
 wire [31:0] mw_mem_write_data;
 wire [31:0] mw_ins_data;
-reg [31:0] mw_pc;
+reg [31:0] mw_next_pc;
 always @* begin
     if(mw_dec_jmp == 1) begin
-        //jump next_pc(upper 4bit) | immidiate(lower 26bit << 2)
-        mw_pc = ({mw_next_pc[31:28], 28'b0} | {4'b0, mw_ins_data[25:0], 2'b0});
+        if(mw_dst_reg == 5'd31) begin
+            //jal, dst_reg == 31
+            mw_next_pc = {4'b0, mw_ins_data[25:0], 2'b0};
+        end
+        else begin
+            //jump next_pc(upper 4bit) | immidiate(lower 26bit << 2)
+            mw_next_pc = ({mw_next_pc[31:28], 28'b0} | {4'b0, mw_ins_data[25:0], 2'b0});
+        end
     end
     else begin
-        mw_pc = (mw_pc_src == 0) ? (mw_next_pc) : (mw_branch_pc);
+        mw_next_pc = (mw_pc_src == 0) ? (_mw_next_pc) : (mw_branch_pc);
     end
 end
+wire [31:0] mw_return_pc;
+assign mw_return_pc = _mw_next_pc;
 
 wire [4:0] mw_dst_reg;
 
@@ -135,8 +154,16 @@ wire [31:0] w_alu_result;
 wire [31:0] w_mem_data;
 wire [4:0] w_dst_reg;
 
-wire [31:0] w_reg_write_data;
-assign w_reg_write_data = (w_dec_mem_to_reg == 0) ? (w_alu_result) : (w_mem_data);
+wire [31:0] w_return_pc;
+reg [31:0] w_reg_write_data;
+always @* begin
+    if(w_dst_reg == 5'd31) begin
+        w_reg_write_data = w_return_pc;
+    end
+    else begin
+        w_reg_write_data = (w_dec_mem_to_reg == 0) ? (w_alu_result) : (w_mem_data);
+    end
+end
 
 wire stage_refresh_n;
 
@@ -171,7 +198,7 @@ STAGE_REG_DE de(
     .in_next_pc(fd_next_pc),
     .in_data0(reg0),
     .in_data1(reg1),
-    .in_dst_reg((fd_dec_reg_dst == 0) ? (fd_ins_data[20:16]) : (fd_ins_data[15:11])),
+    .in_dst_reg(fd_dst_reg),
     .in_dec_alu_src(fd_dec_alu_src),
     .in_dec_mem_to_reg(fd_dec_mem_to_reg),
     .in_dec_reg_write(fd_dec_reg_write),
@@ -180,16 +207,11 @@ STAGE_REG_DE de(
     .in_dec_branch(fd_dec_branch),
     .in_dec_jmp(fd_dec_jmp),
     .in_dec_alu_op(fd_dec_alu_op),
-    /*.in_imm({ // immideate sign extend
-        {16{fd_ins_data[15]}},
-        fd_ins_data[15:0]
-    }),*/
     .in_ins(fd_ins_data),
     .next_pc(em_next_pc),
     .data0(em_reg0),
     .data1(em_reg1),
     .dst_reg(em_dst_reg),
-    //.imm(em_imm),
     .ins(em_ins_data),
     .dec_alu_src(em_alu_src),
     .dec_alu_op(em_alu_op),
@@ -218,7 +240,7 @@ STAGE_REG_EM em(
     .in_dec_branch(em_dec_branch),
     .in_dec_jmp(em_dec_jmp),
     .in_alu_result_zero(em_alu_result_zero),
-    .next_pc(mw_next_pc),
+    .next_pc(_mw_next_pc),
     .branch_pc(mw_branch_pc),
     .alu_result(mw_alu_result),
     .mem_write_data(mw_mem_write_data),
@@ -240,13 +262,15 @@ STAGE_REG_MW mw(
     .in_mem_data(ram_data),
     .in_alu_result(mw_alu_result),
     .in_dst_reg(mw_dst_reg),
+    .in_return_pc(mw_return_pc),
     .in_dec_mem_to_reg(mw_dec_mem_to_reg),
     .in_dec_reg_write(mw_dec_reg_write),
     .mem_data(w_mem_data),
     .alu_result(w_alu_result),
     .dst_reg(w_dst_reg),
     .dec_mem_to_reg(w_dec_mem_to_reg),
-    .dec_reg_write(w_dec_reg_write)
+    .dec_reg_write(w_dec_reg_write),
+    .return_pc(w_return_pc)
 );
 
 
@@ -256,12 +280,11 @@ REGFILE regfile(
     .reg_wren(_reg_wren),
     .r_reg0(fd_ins_data[25:21]),
     .r_reg1(fd_ins_data[20:16]),
-    .w_reg0(w_dst_reg),
-    .w_data(w_reg_write_data),
+    .w_reg0(w_dst_reg), //write selector
+    .w_data(w_reg_write_data), //write data
     .reg0(reg0),
     .reg1(reg1)
 );
-//.r_reg1((fd_dec_reg_dst == 0) ? (fd_ins_data[20:16]) : (fd_ins_data[15:11])),
 
 DECODER dec(
     .ins_op(fd_ins_data[31:26]),
@@ -274,7 +297,8 @@ DECODER dec(
     .mem_write(fd_dec_mem_write),
     .branch(fd_dec_branch),
     .jmp(fd_dec_jmp),
-    .alu_op(fd_dec_alu_op)
+    .alu_op(fd_dec_alu_op),
+    .pc_to_ra(fd_dec_pc_to_ra)
 );
 
 ALU alu(
@@ -297,7 +321,7 @@ PC pc(
     .reset_n(reset_n),
     .clk(clk),
     .wren(pc_wren),
-    .jmp_to(mw_pc),
+    .jmp_to(mw_next_pc),
     .pc_data(pc_data)
 );
 

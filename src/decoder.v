@@ -11,7 +11,8 @@ module DECODER(
     output reg mem_write,
     output reg branch,
     output reg jmp,
-    output reg [2:0] alu_op
+    output reg [2:0] alu_op,
+    output reg pc_to_ra
 );
 
 always @* begin
@@ -24,6 +25,7 @@ always @* begin
     branch = 1'b0;
     jmp = 1'b0;
     alu_op = 4'b000;
+    pc_to_ra = 1'b0;
     
     case(ins_op)
         6'b000000: begin
@@ -47,6 +49,14 @@ always @* begin
             branch = 1'b1;
             jmp = 1'b1;
             alu_op = `ALU_OP_OR;
+        end
+        //jal
+        6'b000011: begin
+            branch = 1'b1;
+            jmp = 1'b1;
+            reg_write = 1'b1;
+            alu_op = `ALU_OP_OR;
+            pc_to_ra = 1'b1;
         end
         //addi
         6'b000100: begin

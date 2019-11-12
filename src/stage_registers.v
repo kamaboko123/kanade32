@@ -161,7 +161,6 @@ always @(posedge clk) begin
         dst_reg <= in_dst_reg;
         mem_write_data <= in_mem_write_data;
     end
-
 end
 
 endmodule
@@ -175,11 +174,13 @@ module STAGE_REG_MW(
     input [31:0] in_mem_data,
     input [31:0] in_alu_result,
     input [4:0] in_dst_reg,
+    input [31:0] in_return_pc,
     input in_dec_mem_to_reg,
     input in_dec_reg_write,
     output reg [31:0] mem_data,
     output reg [31:0] alu_result,
     output reg [4:0] dst_reg,
+    output reg [31:0] return_pc,
     output reg dec_mem_to_reg,
     output reg dec_reg_write
 );
@@ -189,6 +190,7 @@ always @(posedge clk) begin
         mem_data <= 0;
         alu_result <= 0;
         dst_reg <= 0;
+        return_pc <= 0;
         dec_mem_to_reg <= 0;
         dec_reg_write <= 0;
     end
@@ -196,6 +198,7 @@ always @(posedge clk) begin
         mem_data <= in_mem_data;
         alu_result <= in_alu_result;
         dst_reg <= in_dst_reg;
+        return_pc <= in_return_pc;
         dec_mem_to_reg <= in_dec_mem_to_reg;
         dec_reg_write <= in_dec_reg_write;
     end
