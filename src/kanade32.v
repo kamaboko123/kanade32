@@ -82,7 +82,7 @@ wire [31:0] em_reg1;
 wire [31:0] em_data0;
 wire [31:0] em_data1;
 wire [31:0] em_imm;
-assign em_imm =  { {16{em_ins_data[15]}}, em_ins_data[15:0]}; //immideate sign extend
+assign em_imm =  { {16{em_ins_data[15]}}, em_ins_data[15:0]}; //immediate sign extend
 assign em_data0 = em_reg0;
 assign em_data1 = (em_alu_src == 0) ? (em_reg1) : (em_imm);
 wire [4:0] em_dst_reg;
@@ -127,7 +127,7 @@ always @* begin
             mw_next_pc = {4'b0, mw_ins_data[25:0], 2'b0};
         end
         else begin
-            //jump next_pc(upper 4bit) | immidiate(lower 26bit << 2)
+            //jump next_pc(upper 4bit) | immediate(lower 26bit << 2)
             mw_next_pc = ({mw_next_pc[31:28], 28'b0} | {4'b0, mw_ins_data[25:0], 2'b0});
         end
     end

@@ -10,10 +10,10 @@ kanade32 supports some MIPS I instructions.
 
 ### Jump
 - j target
-    - pc = (pc[uppert:4bit] | (target immideate[26bit] * 4))
+    - pc = (pc[uppert:4bit] | (target immediate[26bit] * 4))
 - jal target
     - ra = pc + 4
-    - pc = target immideate[26bit] * 4
+    - pc = target immediate[26bit] * 4
 
 ### branch
 - beq rs, rt, offset
