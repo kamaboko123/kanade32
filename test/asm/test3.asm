@@ -2,7 +2,7 @@
 
 start:
     addi $t0, $zero, 0
-    addi $t1, $zero, 0
+    addi $t1, $zero, 1
     nop
     beq $t0, $t1, b
 

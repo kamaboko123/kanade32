@@ -49,13 +49,17 @@ always @* begin
             alu_op = `ALU_OP_OR;
         end
         //addi
+        6'b000100: begin
+            branch = 1'b1;
+            alu_op = `ALU_OP_SLT;
+        end
         6'b001000: begin
             alu_src = 1'b1;
             reg_write = 1'b1;
             alu_op = `ALU_OP_ADD;
         end
         //lw
-        6'b100011:begin
+        6'b100011: begin
             alu_src = 1'b1;
             mem_to_reg = 1'b1;
             reg_write = 1'b1;

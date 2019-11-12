@@ -10,6 +10,11 @@ kanade32 supports some MIPS I instructions.
 
 ### Jump
 - j imm
+    - pc = (pc[uppert:4bit] | (imm[26bit] * 4))
+
+### branch
+- beq rs, rt, offset
+    - pc += (offset * 4)
 
 ### Memory Access
 - lw rt, offset(rs)

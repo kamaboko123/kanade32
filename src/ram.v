@@ -9,7 +9,7 @@ module RAM(
 reg [29:0] _address;
 reg [31:0] _ram [255:0];
 
-initial $readmemh("test/memdata/test2.mem", _ram);
+initial $readmemh("test/memdata/test3.mem", _ram);
 
 /*
 initial begin
