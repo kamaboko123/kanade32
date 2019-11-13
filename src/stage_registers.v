@@ -44,6 +44,7 @@ module STAGE_REG_DE(
     input in_dec_jmp,
     input [2:0] in_dec_alu_op,
     input in_dec_alu_result_to_pc,
+    input in_dec_pc_to_ra,
     output reg [31:0] next_pc,
     output reg [31:0] data0,
     output reg [31:0] data1,
@@ -57,7 +58,8 @@ module STAGE_REG_DE(
     output reg dec_branch,
     output reg dec_jmp,
     output reg [2:0] dec_alu_op,
-    output reg dec_alu_result_to_pc
+    output reg dec_alu_result_to_pc,
+    output reg dec_pc_to_ra
 );
 
 always @(posedge clk) begin
@@ -77,6 +79,7 @@ always @(posedge clk) begin
         dec_jmp <= 0;
         dec_alu_op <= 0;
         dec_alu_result_to_pc <= 0;
+        dec_pc_to_ra <= 0;
     end
     else if(wren) begin
         next_pc <= in_next_pc;
@@ -94,6 +97,7 @@ always @(posedge clk) begin
         dec_jmp <= in_dec_jmp;
         dec_alu_op <= in_dec_alu_op;
         dec_alu_result_to_pc <= in_dec_alu_result_to_pc;
+        dec_pc_to_ra <= in_dec_pc_to_ra;
     end
 end
 
@@ -120,6 +124,7 @@ module STAGE_REG_EM(
     input in_dec_jmp,
     input in_alu_result_zero,
     input in_dec_alu_result_to_pc,
+    input in_dec_pc_to_ra,
     output reg [31:0] next_pc,
     output reg [31:0] branch_pc,
     output reg [31:0] alu_result,
@@ -133,7 +138,8 @@ module STAGE_REG_EM(
     output reg dec_branch,
     output reg dec_jmp,
     output reg alu_result_zero,
-    output reg dec_alu_result_to_pc
+    output reg dec_alu_result_to_pc,
+    output reg dec_pc_to_ra
 );
 
 always @(posedge clk) begin
@@ -152,6 +158,7 @@ always @(posedge clk) begin
         dst_reg <= 0;
         mem_write_data <= 0;
         dec_alu_result_to_pc <= in_dec_alu_result_to_pc;
+        dec_pc_to_ra <= 0;
     end
     else if(wren) begin
         next_pc <= in_next_pc;
@@ -168,6 +175,7 @@ always @(posedge clk) begin
         dst_reg <= in_dst_reg;
         mem_write_data <= in_mem_write_data;
         dec_alu_result_to_pc <= in_dec_alu_result_to_pc;
+        dec_pc_to_ra <= in_dec_pc_to_ra;
     end
 end
 
@@ -185,12 +193,14 @@ module STAGE_REG_MW(
     input [31:0] in_return_pc,
     input in_dec_mem_to_reg,
     input in_dec_reg_write,
+    input in_dec_pc_to_ra,
     output reg [31:0] mem_data,
     output reg [31:0] alu_result,
     output reg [4:0] dst_reg,
     output reg [31:0] return_pc,
     output reg dec_mem_to_reg,
-    output reg dec_reg_write
+    output reg dec_reg_write,
+    output reg dec_pc_to_ra
 );
 
 always @(posedge clk) begin
@@ -201,6 +211,7 @@ always @(posedge clk) begin
         return_pc <= 0;
         dec_mem_to_reg <= 0;
         dec_reg_write <= 0;
+        dec_pc_to_ra <= 0;
     end
     else if(wren) begin
         mem_data <= in_mem_data;
@@ -209,6 +220,7 @@ always @(posedge clk) begin
         return_pc <= in_return_pc;
         dec_mem_to_reg <= in_dec_mem_to_reg;
         dec_reg_write <= in_dec_reg_write;
+        dec_pc_to_ra <= in_dec_pc_to_ra;
     end
 end
 endmodule

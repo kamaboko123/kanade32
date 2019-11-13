@@ -77,6 +77,7 @@ wire em_dec_mem_write;
 wire em_dec_branch;
 wire em_dec_jmp;
 wire em_dec_alu_result_to_pc;
+wire em_dec_pc_to_ra;
 
 
 //datapath execute
@@ -106,6 +107,7 @@ wire mw_dec_branch;
 wire mw_dec_jmp;
 wire mw_dec_alu_result_to_pc;
 wire mw_mem_wren;
+wire mw_dec_pc_to_ra;
 
 wire mem_wren;
 assign mem_wren = (mw_mem_wren & mw_dec_mem_write);
@@ -133,7 +135,7 @@ always @* begin
             mw_next_pc = mw_alu_result;
         end
         else begin
-            if(mw_dst_reg == 5'd31) begin
+            if(mw_dec_pc_to_ra == 1'b1) begin
                 //jal, dst_reg == 31
                 mw_next_pc = {4'b0, mw_ins_data[25:0], 2'b0};
             end
@@ -165,11 +167,12 @@ assign _reg_wren = (reg_wren & w_dec_reg_write);
 wire [31:0] w_alu_result;
 wire [31:0] w_mem_data;
 wire [4:0] w_dst_reg;
+wire w_dec_pc_to_ra;
 
 wire [31:0] w_return_pc;
 reg [31:0] w_reg_write_data;
 always @* begin
-    if((w_dst_reg == 5'd31) & (w_dec_mem_to_reg == 0)) begin
+    if(w_dec_pc_to_ra) begin
         w_reg_write_data = w_return_pc;
     end
     else begin
@@ -221,6 +224,7 @@ STAGE_REG_DE de(
     .in_dec_alu_op(fd_dec_alu_op),
     .in_ins(fd_ins_data),
     .in_dec_alu_result_to_pc(fd_dec_alu_result_to_pc),
+    .in_dec_pc_to_ra(fd_dec_pc_to_ra),
     .next_pc(em_next_pc),
     .data0(em_reg0),
     .data1(em_reg1),
@@ -234,7 +238,8 @@ STAGE_REG_DE de(
     .dec_mem_write(em_dec_mem_write),
     .dec_branch(em_dec_branch),
     .dec_jmp(em_dec_jmp),
-    .dec_alu_result_to_pc(em_dec_alu_result_to_pc)
+    .dec_alu_result_to_pc(em_dec_alu_result_to_pc),
+    .dec_pc_to_ra(em_dec_pc_to_ra)
 );
 
 STAGE_REG_EM em(
@@ -255,6 +260,7 @@ STAGE_REG_EM em(
     .in_dec_jmp(em_dec_jmp),
     .in_alu_result_zero(em_alu_result_zero),
     .in_dec_alu_result_to_pc(em_dec_alu_result_to_pc),
+    .in_dec_pc_to_ra(em_dec_pc_to_ra),
     .next_pc(_mw_next_pc),
     .branch_pc(mw_branch_pc),
     .alu_result(mw_alu_result),
@@ -268,7 +274,8 @@ STAGE_REG_EM em(
     .dec_branch(mw_dec_branch),
     .dec_jmp(mw_dec_jmp),
     .alu_result_zero(mw_alu_result_zero),
-    .dec_alu_result_to_pc(mw_dec_alu_result_to_pc)
+    .dec_alu_result_to_pc(mw_dec_alu_result_to_pc),
+    .dec_pc_to_ra(mw_dec_pc_to_ra)
 );
 
 STAGE_REG_MW mw(
@@ -281,12 +288,14 @@ STAGE_REG_MW mw(
     .in_return_pc(mw_return_pc),
     .in_dec_mem_to_reg(mw_dec_mem_to_reg),
     .in_dec_reg_write(mw_dec_reg_write),
+    .in_dec_pc_to_ra(mw_dec_pc_to_ra),
     .mem_data(w_mem_data),
     .alu_result(w_alu_result),
     .dst_reg(w_dst_reg),
     .dec_mem_to_reg(w_dec_mem_to_reg),
     .dec_reg_write(w_dec_reg_write),
-    .return_pc(w_return_pc)
+    .return_pc(w_return_pc),
+    .dec_pc_to_ra(w_dec_pc_to_ra)
 );
 
 

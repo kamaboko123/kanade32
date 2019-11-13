@@ -10,18 +10,7 @@ reg [29:0] _address;
 reg [31:0] _ram [2047:0];
 
 initial $readmemh("test_c/memdata/fibonacci.mem", _ram);
-
-/*
-initial begin
-    _ram[0] = 32'h20080005;
-    _ram[1] = 32'h21080005;
-    _ram[2] = 32'hac080040;
-    _ram[3] = 32'h8c0a0040;
-    //_ram[0] = 32'hafbf001c;
-    //_ram[1] = 32'h00000000;
-    //_ram[8] = 32'h11111111;
-end
-*/
+//initial $readmemh("test/memdata/test3.mem", _ram);
 
 always @(posedge clk) begin
     _address <= address;
@@ -30,10 +19,6 @@ always @(posedge clk) begin
     end
 end
 
-wire [31:0] debug;
-assign debug = _ram[32'hbc >> 2];
-wire [31:0] debug2;
-assign debug2 = _ram[32'h7c];
 assign q = _ram[_address];
 
 endmodule
