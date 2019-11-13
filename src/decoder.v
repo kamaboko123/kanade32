@@ -82,7 +82,12 @@ always @* begin
         //beq
         6'b000100: begin
             branch = 1'b1;
-            alu_op = `ALU_OP_SLT;
+            alu_op = `ALU_OP_SUB;
+        end
+        //bne
+        6'b000101: begin
+            branch = 1'b1;
+            alu_op = `ALU_OP_SUB_NOT;
         end
         //addi
         6'b001000: begin
@@ -95,6 +100,12 @@ always @* begin
             alu_src = 1'b1;
             reg_write = 1'b1;
             alu_op = `ALU_OP_ADD;
+        end
+        //slti
+        6'b001010: begin
+            alu_src = 1'b1;
+            reg_write = 1'b1;
+            alu_op = `ALU_OP_SLT;
         end
         //lw
         6'b100011: begin

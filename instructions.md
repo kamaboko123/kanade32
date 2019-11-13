@@ -4,12 +4,20 @@ kanade32 supports some MIPS I instructions.
 ## Kanade32 Instructions
 
 ### Arithmetic
-- addi rd, rs, rt
-- addiu rd, rs, rt
+- addi rt, rs, imm
+    - rt = rs + imm
+- addiu rt, rs, imm
+    - rt = rs + imm
 - add rd, rs, rt
+    - rd = rs + rt
 - addu rd, rs, rt
+    - rd = rs + rt
 - sub rd, rs, rt
+    - rd = rs - rt
 - or rd, rs, rt
+    - rd = rs | rt
+- slti rt, rs, imm
+    - rt = rs < imm
 
 ### Jump
 - j target
@@ -22,7 +30,9 @@ kanade32 supports some MIPS I instructions.
 
 ### branch
 - beq rs, rt, offset
-    - pc += (offset * 4)
+    - if(rs == rt) pc += (offset * 4)
+- bne rs, rt, offset
+    - if(rs != rt) pc += (offset * 4)
 
 ### Memory Access
 - lw rt, offset(rs)

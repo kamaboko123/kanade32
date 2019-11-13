@@ -6,7 +6,9 @@ module ALU(
     output zero //flg for conditional branch
 );
 
-assign zero = (x == 32'h0) ? 1 : 0;
+wire _zero;
+assign _zero = (x == 32'h0) ? 1 : 0;
+assign zero = (op == `ALU_OP_SUB_NOT) ? ~_zero : _zero;
 always @* begin
     case(op)
         `ALU_OP_AND: begin
@@ -21,12 +23,15 @@ always @* begin
         `ALU_OP_SUB: begin
             x = a - b;
         end
+        `ALU_OP_SUB_NOT: begin
+            x = a - b;
+        end
         `ALU_OP_SLT: begin
             if(a < b) begin
-                x = 31'b1;
+                x = 32'b1;
             end
             else begin
-                x = 31'b0;
+                x = 32'b0;
             end
         end
         default: begin
