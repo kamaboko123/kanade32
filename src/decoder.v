@@ -95,7 +95,7 @@ always @* begin
             reg_write = 1'b1;
             alu_op = `ALU_OP_ADD;
         end
-        //addiu
+        //addiu(li)
         6'b001001: begin
             alu_src = 1'b1;
             reg_write = 1'b1;

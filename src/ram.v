@@ -7,9 +7,9 @@ module RAM(
 );
 
 reg [29:0] _address;
-reg [31:0] _ram [1023:0];
+reg [31:0] _ram [2047:0];
 
-initial $readmemh("test_c/memdata/test_for.mem", _ram);
+initial $readmemh("test_c/memdata/fibonacci.mem", _ram);
 
 /*
 initial begin
@@ -31,7 +31,7 @@ always @(posedge clk) begin
 end
 
 wire [31:0] debug;
-assign debug = _ram[32'h10 >> 2];
+assign debug = _ram[32'hbc >> 2];
 wire [31:0] debug2;
 assign debug2 = _ram[32'h7c];
 assign q = _ram[_address];

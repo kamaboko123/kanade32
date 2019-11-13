@@ -4,7 +4,7 @@
 start:
     nop
 main:
-    addi $sp, $zero, 0x200
+    addi $sp, $zero, 0x400
     nop
     jal mips_main
     add $v1, $zero, $v0
