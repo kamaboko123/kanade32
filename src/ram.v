@@ -31,7 +31,9 @@ always @(posedge clk) begin
 end
 
 wire [31:0] debug;
-assign debug = _ram[16];
+assign debug = _ram[32'h10 >> 2];
+wire [31:0] debug2;
+assign debug2 = _ram[32'h7c];
 assign q = _ram[_address];
 
 endmodule

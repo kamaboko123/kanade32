@@ -12,7 +12,8 @@ module DECODER(
     output reg branch,
     output reg jmp,
     output reg [2:0] alu_op,
-    output reg pc_to_ra
+    output reg pc_to_ra,
+    output reg alu_result_to_pc
 );
 
 always @* begin
@@ -26,6 +27,7 @@ always @* begin
     jmp = 1'b0;
     alu_op = 4'b000;
     pc_to_ra = 1'b0;
+    alu_result_to_pc = 1'b0;
     
     case(ins_op)
         6'b000000: begin
@@ -41,6 +43,25 @@ always @* begin
                     reg_dst = 1'b1;
                     reg_write = 1'b1;
                     alu_op = `ALU_OP_SUB;
+                end
+                //jr rs
+                6'b001000: begin
+                    branch = 1'b1;
+                    jmp = 1'b1;
+                    alu_op = 3'b001;
+                    alu_result_to_pc = 1'b1;
+                end
+                6'b100001: begin
+                    //addu
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_ADD;
+                end
+                //or
+                6'b100101: begin
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_OR;
                 end
             endcase
         end
@@ -58,12 +79,19 @@ always @* begin
             alu_op = `ALU_OP_OR;
             pc_to_ra = 1'b1;
         end
-        //addi
+        //beq
         6'b000100: begin
             branch = 1'b1;
             alu_op = `ALU_OP_SLT;
         end
+        //addi
         6'b001000: begin
+            alu_src = 1'b1;
+            reg_write = 1'b1;
+            alu_op = `ALU_OP_ADD;
+        end
+        //addiu
+        6'b001001: begin
             alu_src = 1'b1;
             reg_write = 1'b1;
             alu_op = `ALU_OP_ADD;

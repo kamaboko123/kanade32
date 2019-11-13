@@ -12,6 +12,7 @@ wire ram_addr_src;
 //datapath ram access
 reg [31:0] ram_addr;
 
+//フェッチならプログラムカウンタを参照する
 always @* begin
     if(ram_addr_src == 0) begin
         ram_addr = pc_data;
@@ -53,6 +54,7 @@ wire fd_dec_mem_write;
 wire fd_dec_branch;
 wire fd_dec_jmp;
 wire fd_dec_pc_to_ra;
+wire fd_dec_alu_result_to_pc;
 wire [2:0] fd_dec_alu_op;
 
 //datapath decode -> execute
@@ -74,6 +76,7 @@ wire em_dec_mem_read;
 wire em_dec_mem_write;
 wire em_dec_branch;
 wire em_dec_jmp;
+wire em_dec_alu_result_to_pc;
 
 
 //datapath execute
@@ -101,6 +104,7 @@ wire mw_dec_mem_read;
 wire mw_dec_mem_write;
 wire mw_dec_branch;
 wire mw_dec_jmp;
+wire mw_dec_alu_result_to_pc;
 wire mw_mem_wren;
 
 wire mem_wren;
@@ -122,13 +126,21 @@ wire [31:0] mw_ins_data;
 reg [31:0] mw_next_pc;
 always @* begin
     if(mw_dec_jmp == 1) begin
-        if(mw_dst_reg == 5'd31) begin
-            //jal, dst_reg == 31
-            mw_next_pc = {4'b0, mw_ins_data[25:0], 2'b0};
+        //jmp instructions flg
+        if(mw_dec_alu_result_to_pc) begin
+            //transfar alu_result to pc
+            //jr rs
+            mw_next_pc = mw_alu_result;
         end
         else begin
-            //jump next_pc(upper 4bit) | immediate(lower 26bit << 2)
-            mw_next_pc = ({mw_next_pc[31:28], 28'b0} | {4'b0, mw_ins_data[25:0], 2'b0});
+            if(mw_dst_reg == 5'd31) begin
+                //jal, dst_reg == 31
+                mw_next_pc = {4'b0, mw_ins_data[25:0], 2'b0};
+            end
+            else begin
+                //jump next_pc(upper 4bit) | immediate(lower 26bit << 2)
+                mw_next_pc = ({mw_next_pc[31:28], 28'b0} | {4'b0, mw_ins_data[25:0], 2'b0});
+            end
         end
     end
     else begin
@@ -157,7 +169,7 @@ wire [4:0] w_dst_reg;
 wire [31:0] w_return_pc;
 reg [31:0] w_reg_write_data;
 always @* begin
-    if(w_dst_reg == 5'd31) begin
+    if((w_dst_reg == 5'd31) & (w_dec_mem_to_reg == 0)) begin
         w_reg_write_data = w_return_pc;
     end
     else begin
@@ -208,6 +220,7 @@ STAGE_REG_DE de(
     .in_dec_jmp(fd_dec_jmp),
     .in_dec_alu_op(fd_dec_alu_op),
     .in_ins(fd_ins_data),
+    .in_dec_alu_result_to_pc(fd_dec_alu_result_to_pc),
     .next_pc(em_next_pc),
     .data0(em_reg0),
     .data1(em_reg1),
@@ -220,7 +233,8 @@ STAGE_REG_DE de(
     .dec_mem_read(em_dec_mem_read),
     .dec_mem_write(em_dec_mem_write),
     .dec_branch(em_dec_branch),
-    .dec_jmp(em_dec_jmp)
+    .dec_jmp(em_dec_jmp),
+    .dec_alu_result_to_pc(em_dec_alu_result_to_pc)
 );
 
 STAGE_REG_EM em(
@@ -240,6 +254,7 @@ STAGE_REG_EM em(
     .in_dec_branch(em_dec_branch),
     .in_dec_jmp(em_dec_jmp),
     .in_alu_result_zero(em_alu_result_zero),
+    .in_dec_alu_result_to_pc(em_dec_alu_result_to_pc),
     .next_pc(_mw_next_pc),
     .branch_pc(mw_branch_pc),
     .alu_result(mw_alu_result),
@@ -252,7 +267,8 @@ STAGE_REG_EM em(
     .dec_mem_write(mw_dec_mem_write),
     .dec_branch(mw_dec_branch),
     .dec_jmp(mw_dec_jmp),
-    .alu_result_zero(mw_alu_result_zero)
+    .alu_result_zero(mw_alu_result_zero),
+    .dec_alu_result_to_pc(mw_dec_alu_result_to_pc)
 );
 
 STAGE_REG_MW mw(
@@ -298,7 +314,8 @@ DECODER dec(
     .branch(fd_dec_branch),
     .jmp(fd_dec_jmp),
     .alu_op(fd_dec_alu_op),
-    .pc_to_ra(fd_dec_pc_to_ra)
+    .pc_to_ra(fd_dec_pc_to_ra),
+    .alu_result_to_pc(fd_dec_alu_result_to_pc)
 );
 
 ALU alu(

@@ -5,8 +5,11 @@ kanade32 supports some MIPS I instructions.
 
 ### Arithmetic
 - addi rd, rs, rt
-- sub rd, rs, rt
+- addiu rd, rs, rt
 - add rd, rs, rt
+- addu rd, rs, rt
+- sub rd, rs, rt
+- or rd, rs, rt
 
 ### Jump
 - j target
@@ -14,6 +17,8 @@ kanade32 supports some MIPS I instructions.
 - jal target
     - ra = pc + 4
     - pc = target immediate[26bit] * 4
+- jr rs
+    - pc = rs
 
 ### branch
 - beq rs, rt, offset
