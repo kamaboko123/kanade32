@@ -101,7 +101,7 @@ always @* begin
                 end
             endcase
         end
-        //ble
+        //blt
         6'b000001: begin
             branch = 1'b1;
             alu_op = `ALU_OP_SLT_S;
