@@ -45,6 +45,14 @@ kanade32 supports some MIPS I instructions.
     - if(rs == rt) pc += (offset * 4)
 - bne rs, rt, offset
     - if(rs != rt) pc += (offset * 4)
+- ble rs, rt, offset
+    - if(rs <= rt) pc += (offset * 4)
+- blez rs, offset
+    - if(rs <= 0) pc += (offset * 4)
+- blt rs, rt, offset
+    - if(rs < rt) pc += (offset * 4)
+- bltz rs, offset
+    - if(rs < 0) pc += (offset * 4)
 
 ### Memory Access
 - lw rt, offset(rs)

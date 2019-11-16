@@ -3,12 +3,12 @@ module ALU(
     input [31:0] a,
     input [31:0] b,
     output reg [31:0] x, //result
-    output zero //flg for conditional branch
+    output reg zero //flg for conditional branch
 );
 
-wire _zero;
-assign _zero = (x == 32'h0) ? 1 : 0;
-assign zero = (op == `ALU_OP_SUB_NOT) ? ~_zero : _zero;
+//wire _zero;
+//assign _zero = (x == 32'h0) ? 1 : 0;
+//assign zero = (op == `ALU_OP_SUB_NOT) ? ~_zero : _zero;
 always @* begin
     case(op)
         `ALU_OP_AND: begin
@@ -28,9 +28,11 @@ always @* begin
         end
         `ALU_OP_SUB: begin
             x = a - b;
+            zero = (x == 32'h0) ? 1 : 0;
         end
         `ALU_OP_SUB_NOT: begin
             x = a - b;
+            zero = (x == 32'h0) ? 0 : 1;
         end
         `ALU_OP_SLT: begin
             if(a < b) begin
@@ -39,6 +41,7 @@ always @* begin
             else begin
                 x = 32'b0;
             end
+            zero = (x == 32'h0) ? 1 : 0;
         end
         `ALU_OP_SLT_S: begin
             if(a[31] != b[31]) begin
@@ -57,6 +60,26 @@ always @* begin
                     x = 32'b0;
                 end
             end
+            zero = x;
+        end
+        `ALU_OP_SLE_S: begin
+            if(a[31] != b[31]) begin
+                if(a[30:0] >= b[30:0]) begin
+                    x = 32'b1;
+                end
+                else begin
+                    x = 32'b0;
+                end
+            end
+            else begin
+                if(a[30:0] <= b[30:0]) begin
+                    x = 32'b1;
+                end
+                else begin
+                    x = 32'b0;
+                end
+            end
+            zero = x;
         end
         default: begin
             x = 4'bx;

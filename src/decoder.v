@@ -101,6 +101,11 @@ always @* begin
                 end
             endcase
         end
+        //ble
+        6'b000001: begin
+            branch = 1'b1;
+            alu_op = `ALU_OP_SLT_S;
+        end
         //j
         6'b000010: begin
             branch = 1'b1;
@@ -124,6 +129,11 @@ always @* begin
         6'b000101: begin
             branch = 1'b1;
             alu_op = `ALU_OP_SUB_NOT;
+        end
+        //ble
+        6'b000110: begin
+            branch = 1'b1;
+            alu_op = `ALU_OP_SLE_S;
         end
         //addi
         6'b001000: begin
