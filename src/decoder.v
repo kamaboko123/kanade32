@@ -44,6 +44,12 @@ always @* begin
                     reg_write = 1'b1;
                     alu_op = `ALU_OP_SUB;
                 end
+                //subu
+                6'b100011: begin
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_SUB;
+                end
                 //jr rs
                 6'b001000: begin
                     branch = 1'b1;
@@ -51,17 +57,48 @@ always @* begin
                     alu_op = 3'b001;
                     alu_result_to_pc = 1'b1;
                 end
+                //addu
                 6'b100001: begin
-                    //addu
                     reg_dst = 1'b1;
                     reg_write = 1'b1;
                     alu_op = `ALU_OP_ADD;
+                end
+                //and
+                6'b100100: begin
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_AND;
+                end
+                //nor
+                6'b100111: begin
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_NOR;
                 end
                 //or
                 6'b100101: begin
                     reg_dst = 1'b1;
                     reg_write = 1'b1;
                     alu_op = `ALU_OP_OR;
+                end
+                //slt
+                // FIXME: need to implment sign
+                6'b101010: begin
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_SLT;
+                end
+                //sltu
+                6'b101011: begin
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_SLT;
+                end
+                //xor
+                6'b100110: begin
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_XOR;
                 end
             endcase
         end
@@ -101,11 +138,36 @@ always @* begin
             reg_write = 1'b1;
             alu_op = `ALU_OP_ADD;
         end
+        //andi
+        6'b001100: begin
+            alu_src = 1'b1;
+            reg_write = 1'b1;
+            alu_op = `ALU_OP_AND;
+        end
+        //ori
+        6'b001101: begin
+            alu_src = 1'b1;
+            reg_write = 1'b1;
+            alu_op = `ALU_OP_OR;
+        end
         //slti
+        // FIXME: need to implment sign
         6'b001010: begin
             alu_src = 1'b1;
             reg_write = 1'b1;
             alu_op = `ALU_OP_SLT;
+        end
+        //sltiu
+        6'b001011: begin
+            alu_src = 1'b1;
+            reg_write = 1'b1;
+            alu_op = `ALU_OP_SLT;
+        end
+        //xori
+        6'b001110: begin
+            alu_src = 1'b1;
+            reg_write = 1'b1;
+            alu_op = `ALU_OP_XOR;
         end
         //lw
         6'b100011: begin

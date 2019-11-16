@@ -12,6 +12,8 @@
 `define ALU_OP_OR 3'b001
 `define ALU_OP_ADD 3'b010
 `define ALU_OP_SUB_NOT 3'b011
+`define ALU_OP_NOR 3'b100
+`define ALU_OP_XOR 3'b101
 `define ALU_OP_SUB 3'b110
 `define ALU_OP_SLT 3'b111
 

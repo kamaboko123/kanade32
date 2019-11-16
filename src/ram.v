@@ -9,8 +9,8 @@ module RAM(
 reg [29:0] _address;
 reg [31:0] _ram [2047:0];
 
-initial $readmemh("test_c/memdata/fibonacci.mem", _ram);
-//initial $readmemh("test/memdata/test3.mem", _ram);
+//initial $readmemh("test_c/memdata/fibonacci.mem", _ram);
+initial $readmemh("test/memdata/test5.mem", _ram);
 
 always @(posedge clk) begin
     _address <= address;

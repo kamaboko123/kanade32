@@ -16,8 +16,22 @@ kanade32 supports some MIPS I instructions.
     - rd = rs - rt
 - or rd, rs, rt
     - rd = rs | rt
+- and rd, rs, rt
+    - rd = rs & rt
+- andi rt, rs, imm
+    - rt = rs & imm
+- nor rd, rs, rt
+    - rd = ~(rs | rt)
+- slt rd, rs, rt
+    - (not implemented sign compare)
+    - rd = rs < rt
 - slti rt, rs, imm
+    - (not implemented sign compare)
     - rt = rs < imm
+- xor rd, rs, rt
+    - rd = rs ^ rt
+- xor rt, rs, imm
+    - rt = rs ^ imm
 
 ### Jump
 - j target
@@ -41,3 +55,8 @@ kanade32 supports some MIPS I instructions.
 
 ## Reference of MIPS instructions
 [MIPS Reference Sheet](http://www2.engr.arizona.edu/~ece369/Resources/spim/MIPSReference.pdf)
+
+## WIP
+- lui
+    - need to implement immediate shifter
+

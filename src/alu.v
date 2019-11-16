@@ -17,6 +17,12 @@ always @* begin
         `ALU_OP_OR: begin
             x = a | b;
         end
+        `ALU_OP_NOR: begin
+            x = ~(a | b);
+        end
+        `ALU_OP_XOR: begin
+            x = a ^ b;
+        end
         `ALU_OP_ADD: begin
             x = a + b;
         end
