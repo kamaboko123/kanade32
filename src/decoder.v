@@ -11,7 +11,7 @@ module DECODER(
     output reg mem_write,
     output reg branch,
     output reg jmp,
-    output reg [2:0] alu_op,
+    output reg [3:0] alu_op,
     output reg pc_to_ra,
     output reg alu_result_to_pc
 );
@@ -54,7 +54,7 @@ always @* begin
                 6'b001000: begin
                     branch = 1'b1;
                     jmp = 1'b1;
-                    alu_op = 3'b001;
+                    alu_op = `ALU_OP_OR;
                     alu_result_to_pc = 1'b1;
                 end
                 //addu
@@ -82,11 +82,10 @@ always @* begin
                     alu_op = `ALU_OP_OR;
                 end
                 //slt
-                // FIXME: need to implment sign
                 6'b101010: begin
                     reg_dst = 1'b1;
                     reg_write = 1'b1;
-                    alu_op = `ALU_OP_SLT;
+                    alu_op = `ALU_OP_SLT_S;
                 end
                 //sltu
                 6'b101011: begin
@@ -151,11 +150,10 @@ always @* begin
             alu_op = `ALU_OP_OR;
         end
         //slti
-        // FIXME: need to implment sign
         6'b001010: begin
             alu_src = 1'b1;
             reg_write = 1'b1;
-            alu_op = `ALU_OP_SLT;
+            alu_op = `ALU_OP_SLT_S;
         end
         //sltiu
         6'b001011: begin

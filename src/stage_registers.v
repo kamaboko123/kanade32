@@ -42,7 +42,7 @@ module STAGE_REG_DE(
     input in_dec_mem_write,
     input in_dec_branch,
     input in_dec_jmp,
-    input [2:0] in_dec_alu_op,
+    input [3:0] in_dec_alu_op,
     input in_dec_alu_result_to_pc,
     input in_dec_pc_to_ra,
     output reg [31:0] next_pc,
@@ -57,7 +57,7 @@ module STAGE_REG_DE(
     output reg dec_mem_write,
     output reg dec_branch,
     output reg dec_jmp,
-    output reg [2:0] dec_alu_op,
+    output reg [3:0] dec_alu_op,
     output reg dec_alu_result_to_pc,
     output reg dec_pc_to_ra
 );

@@ -1,5 +1,5 @@
 module ALU(
-    input [2:0] op,
+    input [3:0] op,
     input [31:0] a,
     input [31:0] b,
     output reg [31:0] x, //result
@@ -40,8 +40,26 @@ always @* begin
                 x = 32'b0;
             end
         end
+        `ALU_OP_SLT_S: begin
+            if(a[31] != b[31]) begin
+                if(a[30:0] > b[30:0]) begin
+                    x = 32'b1;
+                end
+                else begin
+                    x = 32'b0;
+                end
+            end
+            else begin
+                if(a[30:0] < b[30:0]) begin
+                    x = 32'b1;
+                end
+                else begin
+                    x = 32'b0;
+                end
+            end
+        end
         default: begin
-            x = 3'bx;
+            x = 4'bx;
         end
     endcase
 end

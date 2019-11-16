@@ -55,7 +55,7 @@ wire fd_dec_branch;
 wire fd_dec_jmp;
 wire fd_dec_pc_to_ra;
 wire fd_dec_alu_result_to_pc;
-wire [2:0] fd_dec_alu_op;
+wire [3:0] fd_dec_alu_op;
 
 //datapath decode -> execute
 wire [31:0] reg0;
@@ -66,7 +66,7 @@ wire [31:0] de_ins_data;
 //contorl execute
 wire em_wren;
 wire em_dec_alu_src;
-wire [2:0] em_alu_op;
+wire [3:0] em_alu_op;
 
 //control execute -> memory access
 wire em_alu_result_zero;

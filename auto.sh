@@ -6,5 +6,5 @@ make $@
 # reflex is needed for use this script
 # https://github.com/cespare/reflex
 
-reflex -r '\.v$' make $@
+reflex -r '\.(v|mem)$' make $@
 
