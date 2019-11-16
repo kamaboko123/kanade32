@@ -65,4 +65,10 @@ kanade32 supports some MIPS I instructions.
 ## WIP
 - lui
     - need to implement immediate shifter
-
+- (Multiply)
+    - need to implement multiply and divide unit
+    - need to implement HI/LO registers
+- bltzal
+    - need to implement full instructions input for DECODER module to identify bltz and bltzal
+- bge, bgez, bgezal, bgtz
+    - need to enhance comparator in ALU
