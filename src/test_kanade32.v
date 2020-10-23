@@ -2,13 +2,16 @@
 
 module TEST_KANADE32();
 
-parameter CLK = 10;
-
 reg reset_n;
-reg clk;
+reg clk_cpu;
+reg clk_video;
 
+//Clock generate(50MHz)
+parameter CLK_PERIOD = 10 * 2;
 always begin
-    #(CLK) clk <= ~clk;
+    #(CLK_PERIOD);
+    clk_video <= ~clk_video;
+    clk_cpu <= ~clk_cpu;
 end
 
 initial begin
@@ -16,17 +19,19 @@ initial begin
     
     #0;
     reset_n <= 1;
-    clk <= 0;
+    clk_cpu <= 0;
+    clk_video <= 0;
     
     #1 reset_n <= 0;
-    #(CLK * 4) reset_n <= 1;
+    #(CLK_PERIOD * 5) reset_n <= 1;
     
-    #1000000 $finish;
+    #10000000 $finish;
 end
 
 KANADE32 kanade(
     .reset_n(reset_n),
-    .clk(clk)
+    .clk(clk_cpu),
+    .clk_video(clk_video)
 );
 
 endmodule

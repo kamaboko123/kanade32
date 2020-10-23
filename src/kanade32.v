@@ -1,6 +1,7 @@
 module KANADE32(
     input reset_n,
-    input clk
+    input clk,
+    input clk_video
 );
 
 wire pc_wren;
@@ -351,13 +352,47 @@ PC pc(
     .pc_data(pc_data)
 );
 
+wire sync_h;
+wire sync_v;
+wire [31:0] vram_data;
+reg [3:0] vram_data_px;
+wire [9:0] v_x;
+wire [9:0] v_y;
+wire [19:0] vram_addr;
+wire [29:0] vram_addr_mem;
+assign vram_addr = (v_y[8:0] * 320) + (v_x[8:0]);
+assign vram_addr_mem = ({14'h1, vram_addr[17:2]});
+
+always @(vram_addr[1:0]) begin
+    case(vram_addr[1:0])
+        0: vram_data_px = vram_data[3:0];
+        1: vram_data_px = vram_data[7:4];
+        2: vram_data_px = vram_data[11:8];
+        3: vram_data_px = vram_data[15:12];
+    endcase
+end
+
+VGA vga(
+    .reset_n(reset_n),
+    .clk(clk_video),
+    .col(vram_data_px),
+    .sync_h(sync_h),
+    .sync_v(sync_v),
+    .v_x(v_x),
+    .v_y(v_y)
+);
+
 
 RAM ram(
     .clk(clk),
     .address(ram_addr[31:2]),
     .q(ram_data),
     .data(mw_mem_write_data),
-    .wren(mem_wren)
+    .wren(mem_wren),
+    .clk_b(clk_video),
+    .address_b(vram_addr_mem),
+    .q_b(vram_data)
 );
+
 
 endmodule
