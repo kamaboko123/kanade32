@@ -9,6 +9,7 @@ module DECODER(
     output reg reg_write,
     output reg mem_read,
     output reg mem_write,
+    output reg [3:0] mem_mask,
     output reg branch,
     output reg jmp,
     output reg [3:0] alu_op,
@@ -23,6 +24,7 @@ always @* begin
     reg_write = 1'b0;
     mem_read = 1'b0;
     mem_write = 1'b0;
+    mem_mask = 4'b1111;
     branch = 1'b0;
     jmp = 1'b0;
     alu_op = 4'b000;
@@ -190,6 +192,21 @@ always @* begin
             alu_src = 1'b1;
             mem_write = 1'b1;
             alu_op = `ALU_OP_ADD;
+            mem_mask = 4'b1111;
+        end
+        //sb
+        6'b101000: begin
+            alu_src = 1'b1;
+            mem_write = 1'b1;
+            alu_op = `ALU_OP_ADD;
+            mem_mask = 4'b0001;
+        end
+        //sh
+        6'b101001: begin
+            alu_src = 1'b1;
+            mem_write = 1'b1;
+            alu_op = `ALU_OP_ADD;
+            mem_mask = 4'b0011;
         end
     endcase
 end

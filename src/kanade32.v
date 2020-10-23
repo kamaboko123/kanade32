@@ -52,6 +52,7 @@ wire fd_dec_mem_to_reg;
 wire fd_dec_reg_write;
 wire fd_dec_mem_read;
 wire fd_dec_mem_write;
+wire [3:0] fd_dec_mem_mask;
 wire fd_dec_branch;
 wire fd_dec_jmp;
 wire fd_dec_pc_to_ra;
@@ -75,6 +76,7 @@ wire em_dec_mem_to_reg;
 wire em_dec_reg_write;
 wire em_dec_mem_read;
 wire em_dec_mem_write;
+wire [3:0] em_dec_mem_mask;
 wire em_dec_branch;
 wire em_dec_jmp;
 wire em_dec_alu_result_to_pc;
@@ -104,6 +106,7 @@ wire mw_wren;
 wire mw_alu_result_zero;
 wire mw_dec_mem_read;
 wire mw_dec_mem_write;
+wire [3:0] mw_dec_mem_mask;
 wire mw_dec_branch;
 wire mw_dec_jmp;
 wire mw_dec_alu_result_to_pc;
@@ -220,6 +223,7 @@ STAGE_REG_DE de(
     .in_dec_reg_write(fd_dec_reg_write),
     .in_dec_mem_read(fd_dec_mem_read),
     .in_dec_mem_write(fd_dec_mem_write),
+    .in_dec_mem_mask(fd_dec_mem_mask),
     .in_dec_branch(fd_dec_branch),
     .in_dec_jmp(fd_dec_jmp),
     .in_dec_alu_op(fd_dec_alu_op),
@@ -237,6 +241,7 @@ STAGE_REG_DE de(
     .dec_reg_write(em_dec_reg_write),
     .dec_mem_read(em_dec_mem_read),
     .dec_mem_write(em_dec_mem_write),
+    .dec_mem_mask(em_dec_mem_mask),
     .dec_branch(em_dec_branch),
     .dec_jmp(em_dec_jmp),
     .dec_alu_result_to_pc(em_dec_alu_result_to_pc),
@@ -257,6 +262,7 @@ STAGE_REG_EM em(
     .in_dec_reg_write(em_dec_reg_write),
     .in_dec_mem_read(em_dec_mem_read),
     .in_dec_mem_write(em_dec_mem_write),
+    .in_dec_mem_mask(em_dec_mem_mask),
     .in_dec_branch(em_dec_branch),
     .in_dec_jmp(em_dec_jmp),
     .in_alu_result_zero(em_alu_result_zero),
@@ -272,6 +278,7 @@ STAGE_REG_EM em(
     .dec_reg_write(mw_dec_reg_write),
     .dec_mem_read(mw_dec_mem_read),
     .dec_mem_write(mw_dec_mem_write),
+    .dec_mem_mask(mw_dec_mem_mask),
     .dec_branch(mw_dec_branch),
     .dec_jmp(mw_dec_jmp),
     .alu_result_zero(mw_alu_result_zero),
@@ -321,6 +328,7 @@ DECODER dec(
     .reg_write(fd_dec_reg_write),
     .mem_read(fd_dec_mem_read),
     .mem_write(fd_dec_mem_write),
+    .mem_mask(fd_dec_mem_mask),
     .branch(fd_dec_branch),
     .jmp(fd_dec_jmp),
     .alu_op(fd_dec_alu_op),
@@ -382,12 +390,29 @@ VGA vga(
     .v_y(v_y)
 );
 
+reg [31:0] ram_write_data;
+reg [3:0] ram_byteen;
+always @* begin
+    if(mw_dec_mem_mask == 4'b0001) begin //byte
+        ram_write_data = mw_mem_write_data << (ram_addr[1:0] * 8);
+        ram_byteen = 4'b1 << ram_addr[1:0];
+    end
+    else if(mw_dec_mem_mask == 4'b0011) begin //short
+        ram_write_data = mw_mem_write_data << (ram_addr[1:0] * 8);
+        ram_byteen = 4'b11 << ram_addr[1:0];
+    end
+    else begin//word
+        ram_write_data = mw_mem_write_data;
+        ram_byteen = 4'b1111;
+    end
+end
 
 RAM ram(
     .clk(clk),
     .address(ram_addr[31:2]),
     .q(ram_data),
-    .data(mw_mem_write_data),
+    .byteena_a(ram_byteen),
+    .data(ram_write_data),
     .wren(mem_wren),
     .clk_b(clk_video),
     .address_b(vram_addr_mem),

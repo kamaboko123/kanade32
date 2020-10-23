@@ -40,6 +40,7 @@ module STAGE_REG_DE(
     input in_dec_reg_write,
     input in_dec_mem_read,
     input in_dec_mem_write,
+    input [3:0] in_dec_mem_mask,
     input in_dec_branch,
     input in_dec_jmp,
     input [3:0] in_dec_alu_op,
@@ -55,6 +56,7 @@ module STAGE_REG_DE(
     output reg dec_reg_write,
     output reg dec_mem_read,
     output reg dec_mem_write,
+    output reg [3:0] dec_mem_mask,
     output reg dec_branch,
     output reg dec_jmp,
     output reg [3:0] dec_alu_op,
@@ -75,6 +77,7 @@ always @(posedge clk) begin
         dec_reg_write <= 0;
         dec_mem_read <= 0;
         dec_mem_write <= 0;
+        dec_mem_mask <= 0;
         dec_branch <= 0;
         dec_jmp <= 0;
         dec_alu_op <= 0;
@@ -93,6 +96,7 @@ always @(posedge clk) begin
         dec_reg_write <= in_dec_reg_write;
         dec_mem_read <= in_dec_mem_read;
         dec_mem_write <= in_dec_mem_write;
+        dec_mem_mask <= in_dec_mem_mask;
         dec_branch <= in_dec_branch;
         dec_jmp <= in_dec_jmp;
         dec_alu_op <= in_dec_alu_op;
@@ -120,6 +124,7 @@ module STAGE_REG_EM(
     input in_dec_reg_write,
     input in_dec_mem_read,
     input in_dec_mem_write,
+    input [3:0] in_dec_mem_mask,
     input in_dec_branch,
     input in_dec_jmp,
     input in_alu_result_zero,
@@ -135,6 +140,7 @@ module STAGE_REG_EM(
     output reg dec_reg_write,
     output reg dec_mem_read,
     output reg dec_mem_write,
+    output reg [3:0] dec_mem_mask,
     output reg dec_branch,
     output reg dec_jmp,
     output reg alu_result_zero,
@@ -151,6 +157,7 @@ always @(posedge clk) begin
         dec_reg_write <= 0;
         dec_mem_read <= 0;
         dec_mem_write <= 0;
+        dec_mem_mask <= 0;
         dec_branch <= 0;
         dec_jmp <= 0;
         alu_result_zero <= 0;
@@ -168,6 +175,7 @@ always @(posedge clk) begin
         dec_reg_write <= in_dec_reg_write;
         dec_mem_read <= in_dec_mem_read;
         dec_mem_write <= in_dec_mem_write;
+        dec_mem_mask <= in_dec_mem_mask;
         dec_branch <= in_dec_branch;
         dec_jmp <= in_dec_jmp;
         alu_result_zero <= in_alu_result_zero;
