@@ -19,5 +19,8 @@
 `define ALU_OP_SLE_S 4'b1110
 `define ALU_OP_SLT_S 4'b1111
 
+`define MEM_MODE_WORD 2'b00
+`define MEM_MODE_HWORD 2'b01
+`define MEM_MODE_BYTE 2'b10
 
 

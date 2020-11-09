@@ -52,7 +52,7 @@ wire fd_dec_mem_to_reg;
 wire fd_dec_reg_write;
 wire fd_dec_mem_read;
 wire fd_dec_mem_write;
-wire [3:0] fd_dec_mem_mask;
+wire [1:0] fd_dec_mem_acc_mode;
 wire fd_dec_branch;
 wire fd_dec_jmp;
 wire fd_dec_pc_to_ra;
@@ -76,7 +76,7 @@ wire em_dec_mem_to_reg;
 wire em_dec_reg_write;
 wire em_dec_mem_read;
 wire em_dec_mem_write;
-wire [3:0] em_dec_mem_mask;
+wire [1:0] em_dec_mem_acc_mode;
 wire em_dec_branch;
 wire em_dec_jmp;
 wire em_dec_alu_result_to_pc;
@@ -106,7 +106,7 @@ wire mw_wren;
 wire mw_alu_result_zero;
 wire mw_dec_mem_read;
 wire mw_dec_mem_write;
-wire [3:0] mw_dec_mem_mask;
+wire [1:0] mw_dec_mem_acc_mode;
 wire mw_dec_branch;
 wire mw_dec_jmp;
 wire mw_dec_alu_result_to_pc;
@@ -160,6 +160,7 @@ wire [4:0] mw_dst_reg;
 
 
 //control write back
+wire [1:0] w_dec_mem_acc_mode; //memory access mode
 wire reg_wren; //control
 wire w_dec_reg_write; //stage register mw
 wire w_dec_mem_to_reg; //stage register mw
@@ -180,7 +181,21 @@ always @* begin
         w_reg_write_data = w_return_pc;
     end
     else begin
-        w_reg_write_data = (w_dec_mem_to_reg == 0) ? (w_alu_result) : (w_mem_data);
+        if(w_dec_mem_to_reg) begin
+            if(w_dec_mem_acc_mode == `MEM_MODE_BYTE) begin //byte access
+                //alu_resultがメモリアドレス、メモリからのデータは32bit固定なので、下位2bit指定されるバイト単位でデータを取り出す
+                w_reg_write_data = (w_mem_data & (32'hFF << (w_alu_result[1:0] * 8))) >> w_alu_result[1:0] * 8;
+            end
+            else if(w_dec_mem_acc_mode == `MEM_MODE_HWORD) begin //half word access
+                w_reg_write_data =  (w_mem_data & (32'hFFFF << (w_alu_result[1] * 8))) >> w_alu_result[1] * 8;
+            end
+            else begin
+                w_reg_write_data = w_mem_data;
+            end
+        end
+        else begin
+            w_reg_write_data = w_alu_result;
+        end
     end
 end
 
@@ -223,7 +238,7 @@ STAGE_REG_DE de(
     .in_dec_reg_write(fd_dec_reg_write),
     .in_dec_mem_read(fd_dec_mem_read),
     .in_dec_mem_write(fd_dec_mem_write),
-    .in_dec_mem_mask(fd_dec_mem_mask),
+    .in_dec_mem_acc_mode(fd_dec_mem_acc_mode),
     .in_dec_branch(fd_dec_branch),
     .in_dec_jmp(fd_dec_jmp),
     .in_dec_alu_op(fd_dec_alu_op),
@@ -241,7 +256,7 @@ STAGE_REG_DE de(
     .dec_reg_write(em_dec_reg_write),
     .dec_mem_read(em_dec_mem_read),
     .dec_mem_write(em_dec_mem_write),
-    .dec_mem_mask(em_dec_mem_mask),
+    .dec_mem_acc_mode(em_dec_mem_acc_mode),
     .dec_branch(em_dec_branch),
     .dec_jmp(em_dec_jmp),
     .dec_alu_result_to_pc(em_dec_alu_result_to_pc),
@@ -262,7 +277,7 @@ STAGE_REG_EM em(
     .in_dec_reg_write(em_dec_reg_write),
     .in_dec_mem_read(em_dec_mem_read),
     .in_dec_mem_write(em_dec_mem_write),
-    .in_dec_mem_mask(em_dec_mem_mask),
+    .in_dec_mem_acc_mode(em_dec_mem_acc_mode),
     .in_dec_branch(em_dec_branch),
     .in_dec_jmp(em_dec_jmp),
     .in_alu_result_zero(em_alu_result_zero),
@@ -278,7 +293,7 @@ STAGE_REG_EM em(
     .dec_reg_write(mw_dec_reg_write),
     .dec_mem_read(mw_dec_mem_read),
     .dec_mem_write(mw_dec_mem_write),
-    .dec_mem_mask(mw_dec_mem_mask),
+    .dec_mem_acc_mode(mw_dec_mem_acc_mode),
     .dec_branch(mw_dec_branch),
     .dec_jmp(mw_dec_jmp),
     .alu_result_zero(mw_alu_result_zero),
@@ -294,12 +309,14 @@ STAGE_REG_MW mw(
     .in_alu_result(mw_alu_result),
     .in_dst_reg(mw_dst_reg),
     .in_return_pc(mw_return_pc),
+    .in_dec_mem_acc_mode(mw_dec_mem_acc_mode),
     .in_dec_mem_to_reg(mw_dec_mem_to_reg),
     .in_dec_reg_write(mw_dec_reg_write),
     .in_dec_pc_to_ra(mw_dec_pc_to_ra),
     .mem_data(w_mem_data),
     .alu_result(w_alu_result),
     .dst_reg(w_dst_reg),
+    .dec_mem_acc_mode(w_dec_mem_acc_mode),
     .dec_mem_to_reg(w_dec_mem_to_reg),
     .dec_reg_write(w_dec_reg_write),
     .return_pc(w_return_pc),
@@ -328,7 +345,7 @@ DECODER dec(
     .reg_write(fd_dec_reg_write),
     .mem_read(fd_dec_mem_read),
     .mem_write(fd_dec_mem_write),
-    .mem_mask(fd_dec_mem_mask),
+    .mem_acc_mode(fd_dec_mem_acc_mode),
     .branch(fd_dec_branch),
     .jmp(fd_dec_jmp),
     .alu_op(fd_dec_alu_op),
@@ -393,19 +410,34 @@ VGA vga(
 reg [31:0] ram_write_data;
 reg [3:0] ram_byteen;
 always @* begin
-    if(mw_dec_mem_mask == 4'b0001) begin //byte
-        ram_write_data = mw_mem_write_data << (ram_addr[1:0] * 8);
-        ram_byteen = 4'b1 << ram_addr[1:0];
+    if(mem_wren == 1'b1) begin //store
+        if(mw_dec_mem_acc_mode == `MEM_MODE_BYTE) begin //byte
+            ram_write_data = mw_mem_write_data << (ram_addr[1:0] * 8);
+            ram_byteen = 4'b1 << ram_addr[1:0];
+        end
+        else if(mw_dec_mem_acc_mode == `MEM_MODE_HWORD) begin //short
+            ram_write_data = mw_mem_write_data << (ram_addr[1:0] * 8);
+            ram_byteen = 4'b11 << ram_addr[1:0];
+        end
+        else begin//word
+            ram_write_data = mw_mem_write_data;
+            ram_byteen = 4'b1111;
+        end
     end
-    else if(mw_dec_mem_mask == 4'b0011) begin //short
-        ram_write_data = mw_mem_write_data << (ram_addr[1:0] * 8);
-        ram_byteen = 4'b11 << ram_addr[1:0];
-    end
-    else begin//word
-        ram_write_data = mw_mem_write_data;
+    else begin //load
         ram_byteen = 4'b1111;
+        /*
+        if(mw_dec_mem_acc_mode == `MEM_MODE_BYTE) begin
+            ram_data =  _ram_data & (32'hFF << (ram_addr[1:0] * 8));
+        end
+        else begin
+            ram_data = _ram_data;
+        end
+        */
     end
 end
+
+wire [31:0] _ram_data;
 
 RAM ram(
     .clk(clk),

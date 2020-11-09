@@ -40,7 +40,7 @@ module STAGE_REG_DE(
     input in_dec_reg_write,
     input in_dec_mem_read,
     input in_dec_mem_write,
-    input [3:0] in_dec_mem_mask,
+    input [1:0] in_dec_mem_acc_mode,
     input in_dec_branch,
     input in_dec_jmp,
     input [3:0] in_dec_alu_op,
@@ -56,7 +56,7 @@ module STAGE_REG_DE(
     output reg dec_reg_write,
     output reg dec_mem_read,
     output reg dec_mem_write,
-    output reg [3:0] dec_mem_mask,
+    output reg [1:0] dec_mem_acc_mode,
     output reg dec_branch,
     output reg dec_jmp,
     output reg [3:0] dec_alu_op,
@@ -77,7 +77,7 @@ always @(posedge clk) begin
         dec_reg_write <= 0;
         dec_mem_read <= 0;
         dec_mem_write <= 0;
-        dec_mem_mask <= 0;
+        dec_mem_acc_mode <= 0;
         dec_branch <= 0;
         dec_jmp <= 0;
         dec_alu_op <= 0;
@@ -96,7 +96,7 @@ always @(posedge clk) begin
         dec_reg_write <= in_dec_reg_write;
         dec_mem_read <= in_dec_mem_read;
         dec_mem_write <= in_dec_mem_write;
-        dec_mem_mask <= in_dec_mem_mask;
+        dec_mem_acc_mode <= in_dec_mem_acc_mode;
         dec_branch <= in_dec_branch;
         dec_jmp <= in_dec_jmp;
         dec_alu_op <= in_dec_alu_op;
@@ -124,7 +124,7 @@ module STAGE_REG_EM(
     input in_dec_reg_write,
     input in_dec_mem_read,
     input in_dec_mem_write,
-    input [3:0] in_dec_mem_mask,
+    input [1:0] in_dec_mem_acc_mode,
     input in_dec_branch,
     input in_dec_jmp,
     input in_alu_result_zero,
@@ -140,7 +140,7 @@ module STAGE_REG_EM(
     output reg dec_reg_write,
     output reg dec_mem_read,
     output reg dec_mem_write,
-    output reg [3:0] dec_mem_mask,
+    output reg [1:0] dec_mem_acc_mode,
     output reg dec_branch,
     output reg dec_jmp,
     output reg alu_result_zero,
@@ -157,7 +157,7 @@ always @(posedge clk) begin
         dec_reg_write <= 0;
         dec_mem_read <= 0;
         dec_mem_write <= 0;
-        dec_mem_mask <= 0;
+        dec_mem_acc_mode <= 0;
         dec_branch <= 0;
         dec_jmp <= 0;
         alu_result_zero <= 0;
@@ -175,7 +175,7 @@ always @(posedge clk) begin
         dec_reg_write <= in_dec_reg_write;
         dec_mem_read <= in_dec_mem_read;
         dec_mem_write <= in_dec_mem_write;
-        dec_mem_mask <= in_dec_mem_mask;
+        dec_mem_acc_mode <= in_dec_mem_acc_mode;
         dec_branch <= in_dec_branch;
         dec_jmp <= in_dec_jmp;
         alu_result_zero <= in_alu_result_zero;
@@ -199,6 +199,7 @@ module STAGE_REG_MW(
     input [31:0] in_alu_result,
     input [4:0] in_dst_reg,
     input [31:0] in_return_pc,
+    input [1:0] in_dec_mem_acc_mode,
     input in_dec_mem_to_reg,
     input in_dec_reg_write,
     input in_dec_pc_to_ra,
@@ -206,6 +207,7 @@ module STAGE_REG_MW(
     output reg [31:0] alu_result,
     output reg [4:0] dst_reg,
     output reg [31:0] return_pc,
+    output reg [1:0] dec_mem_acc_mode,
     output reg dec_mem_to_reg,
     output reg dec_reg_write,
     output reg dec_pc_to_ra
@@ -220,6 +222,7 @@ always @(posedge clk) begin
         dec_mem_to_reg <= 0;
         dec_reg_write <= 0;
         dec_pc_to_ra <= 0;
+        dec_mem_acc_mode <= 0;
     end
     else if(wren) begin
         mem_data <= in_mem_data;
@@ -229,6 +232,7 @@ always @(posedge clk) begin
         dec_mem_to_reg <= in_dec_mem_to_reg;
         dec_reg_write <= in_dec_reg_write;
         dec_pc_to_ra <= in_dec_pc_to_ra;
+        dec_mem_acc_mode <= in_dec_mem_acc_mode;
     end
 end
 endmodule
