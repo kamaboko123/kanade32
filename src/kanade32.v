@@ -52,7 +52,7 @@ wire fd_dec_mem_to_reg;
 wire fd_dec_reg_write;
 wire fd_dec_mem_read;
 wire fd_dec_mem_write;
-wire [1:0] fd_dec_mem_acc_mode;
+wire [2:0] fd_dec_mem_acc_mode;
 wire fd_dec_branch;
 wire fd_dec_jmp;
 wire fd_dec_pc_to_ra;
@@ -76,7 +76,7 @@ wire em_dec_mem_to_reg;
 wire em_dec_reg_write;
 wire em_dec_mem_read;
 wire em_dec_mem_write;
-wire [1:0] em_dec_mem_acc_mode;
+wire [2:0] em_dec_mem_acc_mode;
 wire em_dec_branch;
 wire em_dec_jmp;
 wire em_dec_alu_result_to_pc;
@@ -106,7 +106,7 @@ wire mw_wren;
 wire mw_alu_result_zero;
 wire mw_dec_mem_read;
 wire mw_dec_mem_write;
-wire [1:0] mw_dec_mem_acc_mode;
+wire [2:0] mw_dec_mem_acc_mode;
 wire mw_dec_branch;
 wire mw_dec_jmp;
 wire mw_dec_alu_result_to_pc;
@@ -160,7 +160,7 @@ wire [4:0] mw_dst_reg;
 
 
 //control write back
-wire [1:0] w_dec_mem_acc_mode; //memory access mode
+wire [2:0] w_dec_mem_acc_mode; //memory access mode
 wire reg_wren; //control
 wire w_dec_reg_write; //stage register mw
 wire w_dec_mem_to_reg; //stage register mw
@@ -176,18 +176,31 @@ wire w_dec_pc_to_ra;
 
 wire [31:0] w_return_pc;
 reg [31:0] w_reg_write_data;
+
+//メモリからレジスタにデータを読み出すとき(load命令)のデータの計算
+wire [31:0] w_reg_write_data_from_mem_byte;
+wire [31:0] w_reg_write_data_from_mem_hword;
+//alu_resultがメモリアドレス、メモリからのデータは32bit固定なので、下位2bit指定されるバイト単位でデータを取り出す
+assign w_reg_write_data_from_mem_byte = (w_mem_data & (32'hFF << (w_alu_result[1:0] * 8))) >> w_alu_result[1:0] * 8;
+assign w_reg_write_data_from_mem_hword = (w_mem_data & (32'hFFFF << (w_alu_result[1] * 8))) >> w_alu_result[1] * 8;
+
 always @* begin
     if(w_dec_pc_to_ra) begin
         w_reg_write_data = w_return_pc;
     end
     else begin
         if(w_dec_mem_to_reg) begin
-            if(w_dec_mem_acc_mode == `MEM_MODE_BYTE) begin //byte access
-                //alu_resultがメモリアドレス、メモリからのデータは32bit固定なので、下位2bit指定されるバイト単位でデータを取り出す
-                w_reg_write_data = (w_mem_data & (32'hFF << (w_alu_result[1:0] * 8))) >> w_alu_result[1:0] * 8;
+            if(w_dec_mem_acc_mode == `MEM_MODE_BYTE) begin //byte access(unsigned)
+                w_reg_write_data = w_reg_write_data_from_mem_byte;
             end
-            else if(w_dec_mem_acc_mode == `MEM_MODE_HWORD) begin //half word access
-                w_reg_write_data =  (w_mem_data & (32'hFFFF << (w_alu_result[1] * 8))) >> w_alu_result[1] * 8;
+            else if(w_dec_mem_acc_mode == `MEM_MODE_BYTE_SIGN) begin //byte access(signed)
+                w_reg_write_data = {{24{w_reg_write_data_from_mem_byte[7]}}, w_reg_write_data_from_mem_byte[7:0]};
+            end
+            else if(w_dec_mem_acc_mode == `MEM_MODE_HWORD) begin //half word access(unsigned)
+                w_reg_write_data = w_reg_write_data_from_mem_hword;
+            end
+            else if(w_dec_mem_acc_mode == `MEM_MODE_HWORD_SIGN) begin //half word access(signed)
+                w_reg_write_data = {{16{w_reg_write_data_from_mem_hword[15]}}, w_reg_write_data_from_mem_hword[15:0]};
             end
             else begin
                 w_reg_write_data = w_mem_data;

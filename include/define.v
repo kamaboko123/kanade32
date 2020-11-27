@@ -19,8 +19,12 @@
 `define ALU_OP_SLE_S 4'b1110
 `define ALU_OP_SLT_S 4'b1111
 
-`define MEM_MODE_WORD 2'b00
-`define MEM_MODE_HWORD 2'b01
-`define MEM_MODE_BYTE 2'b10
+`define MEM_MODE_WORD 3'b000
+`define MEM_MODE_HWORD 3'b001
+`define MEM_MODE_BYTE 3'b010
+ //以下load命令のみ
+`define MEM_MODE_HWORD_SIGN 3'b101
+`define MEM_MODE_BYTE_SIGN 3'b110
+
 
 

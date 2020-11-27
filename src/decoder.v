@@ -9,7 +9,7 @@ module DECODER(
     output reg reg_write,
     output reg mem_read,
     output reg mem_write,
-    output reg [1:0] mem_acc_mode,
+    output reg [2:0] mem_acc_mode,
     output reg branch,
     output reg jmp,
     output reg [3:0] alu_op,
@@ -196,6 +196,15 @@ always @* begin
             alu_op = `ALU_OP_ADD;
             mem_acc_mode = `MEM_MODE_BYTE;
         end
+        //lb
+        6'b100000: begin
+            alu_src = 1'b1;
+            mem_to_reg = 1'b1;
+            reg_write = 1'b1;
+            mem_read = 1'b1;
+            alu_op = `ALU_OP_ADD;
+            mem_acc_mode = `MEM_MODE_BYTE_SIGN;
+        end
         //lhu
         6'b100101: begin
             alu_src = 1'b1;
@@ -204,6 +213,15 @@ always @* begin
             mem_read = 1'b1;
             alu_op = `ALU_OP_ADD;
             mem_acc_mode = `MEM_MODE_HWORD;
+        end
+        //lh
+        6'b100001: begin
+            alu_src = 1'b1;
+            mem_to_reg = 1'b1;
+            reg_write = 1'b1;
+            mem_read = 1'b1;
+            alu_op = `ALU_OP_ADD;
+            mem_acc_mode = `MEM_MODE_HWORD_SIGN;
         end
 
         //sw
