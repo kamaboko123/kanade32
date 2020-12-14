@@ -14,7 +14,9 @@ module DECODER(
     output reg jmp,
     output reg [3:0] alu_op,
     output reg pc_to_ra,
-    output reg alu_result_to_pc
+    output reg alu_result_to_pc,
+    output reg reg_hi_write,
+    output reg reg_lo_write
 );
 
 always @* begin
@@ -30,6 +32,8 @@ always @* begin
     alu_op = 4'b000;
     pc_to_ra = 1'b0;
     alu_result_to_pc = 1'b0;
+    reg_hi_write = 1'b0;
+    reg_lo_write = 1'b0;
     
     case(ins_op)
         6'b000000: begin
@@ -100,6 +104,14 @@ always @* begin
                     reg_dst = 1'b1;
                     reg_write = 1'b1;
                     alu_op = `ALU_OP_XOR;
+                end
+                //mult
+                6'b011000: begin
+                    reg_dst = 1'b0;
+                    reg_write = 1'b0;
+                    alu_op = `ALU_OP_MUL;
+                    reg_hi_write = 1'b1;
+                    reg_lo_write = 1'b1;
                 end
             endcase
         end

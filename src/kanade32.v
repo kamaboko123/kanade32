@@ -58,6 +58,9 @@ wire fd_dec_jmp;
 wire fd_dec_pc_to_ra;
 wire fd_dec_alu_result_to_pc;
 wire [3:0] fd_dec_alu_op;
+wire fd_dec_reg_hi_write;
+wire fd_dec_reg_lo_write;
+
 
 //datapath decode -> execute
 wire [31:0] reg0;
@@ -81,6 +84,8 @@ wire em_dec_branch;
 wire em_dec_jmp;
 wire em_dec_alu_result_to_pc;
 wire em_dec_pc_to_ra;
+wire em_dec_reg_hi_write;
+wire em_dec_reg_lo_write;
 
 
 //datapath execute
@@ -99,7 +104,7 @@ wire [31:0] em_next_pc;
 wire [31:0] em_branch_pc;
 wire [31:0] em_alu_result;
 wire [31:0] em_ins_data;
-
+wire [63:0] em_alu_result_x64;
 
 //control memory access
 wire mw_wren;
@@ -112,6 +117,8 @@ wire mw_dec_jmp;
 wire mw_dec_alu_result_to_pc;
 wire mw_mem_wren;
 wire mw_dec_pc_to_ra;
+wire mw_dec_reg_hi_write;
+wire mw_dec_reg_lo_write;
 
 wire mem_wren;
 assign mem_wren = (mw_mem_wren & mw_dec_mem_write);
@@ -127,6 +134,7 @@ wire mw_dec_reg_write;
 wire [31:0] _mw_next_pc;
 wire [31:0] mw_branch_pc;
 wire [31:0] mw_alu_result;
+wire [63:0] mw_alu_result_x64;
 wire [31:0] mw_mem_write_data;
 wire [31:0] mw_ins_data;
 reg [31:0] mw_next_pc;
@@ -171,8 +179,11 @@ assign _reg_wren = (reg_wren & w_dec_reg_write);
 //datapath write back
 wire [31:0] w_alu_result;
 wire [31:0] w_mem_data;
+wire [63:0] w_alu_result_x64;
 wire [4:0] w_dst_reg;
 wire w_dec_pc_to_ra;
+wire w_dec_reg_hi_write;
+wire w_dec_reg_lo_write;
 
 wire [31:0] w_return_pc;
 reg [31:0] w_reg_write_data;
@@ -184,6 +195,7 @@ wire [31:0] w_reg_write_data_from_mem_hword;
 assign w_reg_write_data_from_mem_byte = (w_mem_data & (32'hFF << (w_alu_result[1:0] * 8))) >> w_alu_result[1:0] * 8;
 assign w_reg_write_data_from_mem_hword = (w_mem_data & (32'hFFFF << (w_alu_result[1] * 8))) >> w_alu_result[1] * 8;
 
+//レジスタに書き込むデータの生成
 always @* begin
     if(w_dec_pc_to_ra) begin
         w_reg_write_data = w_return_pc;
@@ -258,6 +270,8 @@ STAGE_REG_DE de(
     .in_ins(fd_ins_data),
     .in_dec_alu_result_to_pc(fd_dec_alu_result_to_pc),
     .in_dec_pc_to_ra(fd_dec_pc_to_ra),
+    .in_dec_reg_hi_write(fd_dec_reg_hi_write),
+    .in_dec_reg_lo_write(fd_dec_reg_lo_write),
     .next_pc(em_next_pc),
     .data0(em_reg0),
     .data1(em_reg1),
@@ -273,7 +287,9 @@ STAGE_REG_DE de(
     .dec_branch(em_dec_branch),
     .dec_jmp(em_dec_jmp),
     .dec_alu_result_to_pc(em_dec_alu_result_to_pc),
-    .dec_pc_to_ra(em_dec_pc_to_ra)
+    .dec_pc_to_ra(em_dec_pc_to_ra),
+    .dec_reg_hi_write(em_dec_reg_hi_write),
+    .dec_reg_lo_write(em_dec_reg_lo_write)
 );
 
 STAGE_REG_EM em(
@@ -296,6 +312,9 @@ STAGE_REG_EM em(
     .in_alu_result_zero(em_alu_result_zero),
     .in_dec_alu_result_to_pc(em_dec_alu_result_to_pc),
     .in_dec_pc_to_ra(em_dec_pc_to_ra),
+    .in_dec_reg_hi_write(em_dec_reg_hi_write),
+    .in_dec_reg_lo_write(em_dec_reg_lo_write),
+    .in_alu_result_x64(em_alu_result_x64),
     .next_pc(_mw_next_pc),
     .branch_pc(mw_branch_pc),
     .alu_result(mw_alu_result),
@@ -311,7 +330,10 @@ STAGE_REG_EM em(
     .dec_jmp(mw_dec_jmp),
     .alu_result_zero(mw_alu_result_zero),
     .dec_alu_result_to_pc(mw_dec_alu_result_to_pc),
-    .dec_pc_to_ra(mw_dec_pc_to_ra)
+    .dec_pc_to_ra(mw_dec_pc_to_ra),
+    .dec_reg_hi_write(mw_dec_reg_hi_write),
+    .dec_reg_lo_write(mw_dec_reg_lo_write),
+    .alu_result_x64(mw_alu_result_x64)
 );
 
 STAGE_REG_MW mw(
@@ -326,6 +348,9 @@ STAGE_REG_MW mw(
     .in_dec_mem_to_reg(mw_dec_mem_to_reg),
     .in_dec_reg_write(mw_dec_reg_write),
     .in_dec_pc_to_ra(mw_dec_pc_to_ra),
+    .in_dec_reg_hi_write(mw_dec_reg_hi_write),
+    .in_dec_reg_lo_write(mw_dec_reg_lo_write),
+    .in_alu_result_x64(mw_alu_result_x64),
     .mem_data(w_mem_data),
     .alu_result(w_alu_result),
     .dst_reg(w_dst_reg),
@@ -333,9 +358,22 @@ STAGE_REG_MW mw(
     .dec_mem_to_reg(w_dec_mem_to_reg),
     .dec_reg_write(w_dec_reg_write),
     .return_pc(w_return_pc),
-    .dec_pc_to_ra(w_dec_pc_to_ra)
+    .dec_pc_to_ra(w_dec_pc_to_ra),
+    .dec_reg_hi_write(w_dec_reg_hi_write),
+    .dec_reg_lo_write(w_dec_reg_lo_write),
+    .alu_result_x64(w_alu_result_x64)
 );
 
+HILO_REGISTER hilo_reg(
+    .reset_n(reset_n),
+    .clk(clk),
+    .write_hi(w_dec_reg_hi_write),
+    .write_lo(w_dec_reg_hi_write),
+    .in_data_hi(w_alu_result_x64[63:32]),
+    .in_data_lo(w_alu_result_x64[31:0])
+    //data_hi,
+    //data_lo
+);
 
 REGFILE regfile(
     .reset_n(reset_n),
@@ -363,7 +401,9 @@ DECODER dec(
     .jmp(fd_dec_jmp),
     .alu_op(fd_dec_alu_op),
     .pc_to_ra(fd_dec_pc_to_ra),
-    .alu_result_to_pc(fd_dec_alu_result_to_pc)
+    .alu_result_to_pc(fd_dec_alu_result_to_pc),
+    .reg_hi_write(fd_dec_reg_hi_write),
+    .reg_lo_write(fd_dec_reg_lo_write)
 );
 
 ALU alu(
@@ -371,7 +411,8 @@ ALU alu(
     .a(em_data0),
     .b(em_data1),
     .x(em_alu_result),
-    .zero(em_alu_result_zero)
+    .zero(em_alu_result_zero),
+    .x64(em_alu_result_x64)
 );
 
 ALU pc_alu_branch(

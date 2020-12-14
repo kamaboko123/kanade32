@@ -3,7 +3,8 @@ module ALU(
     input [31:0] a,
     input [31:0] b,
     output reg [31:0] x, //result
-    output reg zero //flg for conditional branch
+    output reg zero, //flg for conditional branch
+    output reg [63:0] x64
 );
 
 //wire _zero;
@@ -81,8 +82,11 @@ always @* begin
             end
             zero = x;
         end
+        `ALU_OP_MUL: begin
+            x64 = a * b;
+        end
         default: begin
-            x = 4'bx;
+            x64 = 4'bx;
         end
     endcase
 end

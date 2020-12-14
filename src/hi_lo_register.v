@@ -9,6 +9,10 @@ module HILO_REGISTER(
     output reg [31:0] data_lo
 );
 
+wire [31:0] debug_hi, debug_lo;
+assign debug_hi = data_hi;
+assign debug_lo = data_lo;
+
 always @(posedge clk) begin
     if(!reset_n) begin
         data_hi <= 32'b0;

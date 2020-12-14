@@ -16,8 +16,9 @@
 `define ALU_OP_XOR 4'b0101
 `define ALU_OP_SUB 4'b0110
 `define ALU_OP_SLT 4'b0111
-`define ALU_OP_SLE_S 4'b1110
-`define ALU_OP_SLT_S 4'b1111
+`define ALU_OP_SLE_S 4'b1000
+`define ALU_OP_SLT_S 4'b1001
+`define ALU_OP_MUL 4'b1010
 
 `define MEM_MODE_WORD 3'b000
 `define MEM_MODE_HWORD 3'b001
