@@ -109,10 +109,42 @@ always @* begin
                 6'b011000: begin
                     reg_dst = 1'b0;
                     reg_write = 1'b0;
-                    alu_op = `ALU_OP_MUL;
+                    alu_op = `ALU_OP_MULT;
                     reg_hi_write = 1'b1;
                     reg_lo_write = 1'b1;
                 end
+                //multu
+                6'b011001: begin
+                    reg_dst = 1'b0;
+                    reg_write = 1'b0;
+                    alu_op = `ALU_OP_MULTU;
+                    reg_hi_write = 1'b1;
+                    reg_lo_write = 1'b1;
+                end
+                //div
+                6'b011010: begin
+                    reg_dst = 1'b0;
+                    reg_write = 1'b0;
+                    alu_op = `ALU_OP_DIV;
+                    reg_hi_write = 1'b1;
+                    reg_lo_write = 1'b1;
+                end
+                //divu
+                6'b011011: begin
+                    reg_dst = 1'b0;
+                    reg_write = 1'b0;
+                    alu_op = `ALU_OP_DIVU;
+                    reg_hi_write = 1'b1;
+                    reg_lo_write = 1'b1;
+                end
+                //mflo
+                6'b010010: begin
+                    reg_dst = 1'b1; //転送先はrd
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_ADD;
+                end
+                //lhi
+                
             endcase
         end
         //blt

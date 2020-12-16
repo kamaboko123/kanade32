@@ -82,11 +82,22 @@ always @* begin
             end
             zero = x;
         end
-        `ALU_OP_MUL: begin
+        `ALU_OP_MULT: begin
             x64 = a * b;
         end
+        `ALU_OP_MULTU: begin
+            x64 = a * b;
+        end
+        `ALU_OP_DIV: begin
+            x64[63:32] = a / b;
+            x64[31:0] = a % b;
+        end
+        `ALU_OP_DIVU: begin
+            x64[63:32] = a / b;
+            x64[31:0] = a % b;
+        end
         default: begin
-            x64 = 4'bx;
+            x64 = 64'b0;
         end
     endcase
 end

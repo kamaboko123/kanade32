@@ -6,7 +6,7 @@ SRC = $(wildcard $(SRC_DIR)/*.asm)
 OBJ = $(addprefix $(TARGET_DIR)/, $(notdir $(SRC:.asm=.o)))
 BIN = $(addprefix $(TARGET_DIR)/, $(notdir $(SRC:.asm=.bin)))
 MEM = $(addprefix $(MEMDATA_DIR)/, $(notdir $(SRC:.asm=.mem)))
-ASFLAGS=-mips1
+ASFLAGS=-mips1 -O0 --no-break --no-trap
 
 .SECONDARY: $(BIN) $(OBJ)
 

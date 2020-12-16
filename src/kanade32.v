@@ -179,7 +179,6 @@ assign _reg_wren = (reg_wren & w_dec_reg_write);
 //datapath write back
 wire [31:0] w_alu_result;
 wire [31:0] w_mem_data;
-wire [63:0] w_alu_result_x64;
 wire [4:0] w_dst_reg;
 wire w_dec_pc_to_ra;
 wire w_dec_reg_hi_write;
@@ -348,9 +347,6 @@ STAGE_REG_MW mw(
     .in_dec_mem_to_reg(mw_dec_mem_to_reg),
     .in_dec_reg_write(mw_dec_reg_write),
     .in_dec_pc_to_ra(mw_dec_pc_to_ra),
-    .in_dec_reg_hi_write(mw_dec_reg_hi_write),
-    .in_dec_reg_lo_write(mw_dec_reg_lo_write),
-    .in_alu_result_x64(mw_alu_result_x64),
     .mem_data(w_mem_data),
     .alu_result(w_alu_result),
     .dst_reg(w_dst_reg),
@@ -358,19 +354,16 @@ STAGE_REG_MW mw(
     .dec_mem_to_reg(w_dec_mem_to_reg),
     .dec_reg_write(w_dec_reg_write),
     .return_pc(w_return_pc),
-    .dec_pc_to_ra(w_dec_pc_to_ra),
-    .dec_reg_hi_write(w_dec_reg_hi_write),
-    .dec_reg_lo_write(w_dec_reg_lo_write),
-    .alu_result_x64(w_alu_result_x64)
+    .dec_pc_to_ra(w_dec_pc_to_ra)
 );
 
 HILO_REGISTER hilo_reg(
     .reset_n(reset_n),
     .clk(clk),
-    .write_hi(w_dec_reg_hi_write),
-    .write_lo(w_dec_reg_hi_write),
-    .in_data_hi(w_alu_result_x64[63:32]),
-    .in_data_lo(w_alu_result_x64[31:0])
+    .write_hi(mw_dec_reg_hi_write),
+    .write_lo(mw_dec_reg_hi_write),
+    .in_data_hi(mw_alu_result_x64[63:32]),
+    .in_data_lo(mw_alu_result_x64[31:0])
     //data_hi,
     //data_lo
 );
