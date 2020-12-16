@@ -182,6 +182,7 @@ wire [2:0] w_dec_reg_write_data_src;
 
 wire [31:0] w_return_pc;
 reg [31:0] w_reg_write_data;
+wire [63:0] w_hilo_data;
 
 //メモリからレジスタにデータを読み出すとき(load命令)のデータの計算
 wire [31:0] w_reg_write_data_from_mem_byte;
@@ -216,10 +217,10 @@ always @* begin
             endcase
         end
         `REG_WRITE_DATA_SRC_RHI: begin
-            w_reg_write_data = 32'bx;
+            w_reg_write_data = w_hilo_data[63:32];
         end
         `REG_WRITE_DATA_SRC_RLO: begin
-            w_reg_write_data = 32'bx;
+            w_reg_write_data = w_hilo_data[31:0];
         end
         `REG_WRITE_DATA_SRC_ALU: begin
             w_reg_write_data = w_alu_result;
@@ -364,7 +365,9 @@ HILO_REGISTER hilo_reg(
     .write_hi(mw_dec_reg_hi_write),
     .write_lo(mw_dec_reg_hi_write),
     .in_data_hi(mw_alu_result_x64[63:32]),
-    .in_data_lo(mw_alu_result_x64[31:0])
+    .in_data_lo(mw_alu_result_x64[31:0]),
+    .data_hi(w_hilo_data[63:32]),
+    .data_lo(w_hilo_data[31:0])
     //data_hi,
     //data_lo
 );

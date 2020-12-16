@@ -140,9 +140,15 @@ always @* begin
                     reg_dst = 1'b1; //転送先はrd
                     reg_write = 1'b1;
                     alu_op = `ALU_OP_ADD;
+                    reg_write_data_src = `REG_WRITE_DATA_SRC_RLO;
                 end
-                //lhi
-                
+                //mfhi
+                6'b010000: begin
+                    reg_dst = 1'b1; //転送先はrd
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_ADD;
+                    reg_write_data_src = `REG_WRITE_DATA_SRC_RHI;
+                end
             endcase
         end
         //blt

@@ -26,8 +26,8 @@ assign mask_a2 = {8{byteena_a[2]}};
 assign mask_a3 = {8{byteena_a[3]}};
 assign mask_a = {mask_a3, mask_a2, mask_a1, mask_a0};
 
-initial $readmemh("test_c/memdata/fibonacci.mem", _ram);
-//initial $readmemh("test/memdata/multi.mem", _ram);
+//initial $readmemh("test_c/memdata/fibonacci.mem", _ram);
+initial $readmemh("test/memdata/multi.mem", _ram);
 
 always @(posedge clk) begin
     _address <= address;
