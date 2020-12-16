@@ -34,7 +34,7 @@ wire [31:0] fd_next_pc;
 
 reg [4:0] fd_dst_reg;
 always @* begin
-    if(fd_dec_pc_to_ra == 1) begin
+    if(fd_dec_reg_write_data_src == `REG_WRITE_DATA_SRC_PC) begin
         fd_dst_reg = 5'd31; //ra register(for jal instrution)
     end
     else begin
@@ -44,22 +44,21 @@ end
 
 //contorl decode
 wire de_wren;
-wire fd_dec_reg_dst;
+wire fd_dec_reg_dst; //0 = rt, 1 = rd
 
 //control decode -> execute
 wire fd_dec_alu_src;
-wire fd_dec_mem_to_reg;
 wire fd_dec_reg_write;
 wire fd_dec_mem_read;
 wire fd_dec_mem_write;
 wire [2:0] fd_dec_mem_acc_mode;
 wire fd_dec_branch;
 wire fd_dec_jmp;
-wire fd_dec_pc_to_ra;
 wire fd_dec_alu_result_to_pc;
 wire [3:0] fd_dec_alu_op;
 wire fd_dec_reg_hi_write;
 wire fd_dec_reg_lo_write;
+wire [2:0] fd_dec_reg_write_data_src;
 
 
 //datapath decode -> execute
@@ -75,7 +74,6 @@ wire [3:0] em_alu_op;
 
 //control execute -> memory access
 wire em_alu_result_zero;
-wire em_dec_mem_to_reg;
 wire em_dec_reg_write;
 wire em_dec_mem_read;
 wire em_dec_mem_write;
@@ -83,9 +81,9 @@ wire [2:0] em_dec_mem_acc_mode;
 wire em_dec_branch;
 wire em_dec_jmp;
 wire em_dec_alu_result_to_pc;
-wire em_dec_pc_to_ra;
 wire em_dec_reg_hi_write;
 wire em_dec_reg_lo_write;
+wire [2:0] em_dec_reg_write_data_src;
 
 
 //datapath execute
@@ -116,9 +114,9 @@ wire mw_dec_branch;
 wire mw_dec_jmp;
 wire mw_dec_alu_result_to_pc;
 wire mw_mem_wren;
-wire mw_dec_pc_to_ra;
 wire mw_dec_reg_hi_write;
 wire mw_dec_reg_lo_write;
+wire [2:0] mw_dec_reg_write_data_src;
 
 wire mem_wren;
 assign mem_wren = (mw_mem_wren & mw_dec_mem_write);
@@ -127,7 +125,6 @@ wire mw_pc_src;
 assign mw_pc_src = (mw_dec_branch & mw_alu_result_zero);
 
 //control memory access -> write back
-wire mw_dec_mem_to_reg;
 wire mw_dec_reg_write;
 
 //datapath memory access
@@ -147,7 +144,7 @@ always @* begin
             mw_next_pc = mw_alu_result;
         end
         else begin
-            if(mw_dec_pc_to_ra == 1'b1) begin
+            if(mw_dec_reg_write_data_src == `REG_WRITE_DATA_SRC_PC) begin
                 //jal, dst_reg == 31
                 mw_next_pc = {4'b0, mw_ins_data[25:0], 2'b0};
             end
@@ -171,7 +168,6 @@ wire [4:0] mw_dst_reg;
 wire [2:0] w_dec_mem_acc_mode; //memory access mode
 wire reg_wren; //control
 wire w_dec_reg_write; //stage register mw
-wire w_dec_mem_to_reg; //stage register mw
 
 wire _reg_wren;
 assign _reg_wren = (reg_wren & w_dec_reg_write);
@@ -180,9 +176,9 @@ assign _reg_wren = (reg_wren & w_dec_reg_write);
 wire [31:0] w_alu_result;
 wire [31:0] w_mem_data;
 wire [4:0] w_dst_reg;
-wire w_dec_pc_to_ra;
 wire w_dec_reg_hi_write;
 wire w_dec_reg_lo_write;
+wire [2:0] w_dec_reg_write_data_src;
 
 wire [31:0] w_return_pc;
 reg [31:0] w_reg_write_data;
@@ -196,31 +192,42 @@ assign w_reg_write_data_from_mem_hword = (w_mem_data & (32'hFFFF << (w_alu_resul
 
 //レジスタに書き込むデータの生成
 always @* begin
-    if(w_dec_pc_to_ra) begin
-        w_reg_write_data = w_return_pc;
-    end
-    else begin
-        if(w_dec_mem_to_reg) begin
-            if(w_dec_mem_acc_mode == `MEM_MODE_BYTE) begin //byte access(unsigned)
-                w_reg_write_data = w_reg_write_data_from_mem_byte;
-            end
-            else if(w_dec_mem_acc_mode == `MEM_MODE_BYTE_SIGN) begin //byte access(signed)
-                w_reg_write_data = {{24{w_reg_write_data_from_mem_byte[7]}}, w_reg_write_data_from_mem_byte[7:0]};
-            end
-            else if(w_dec_mem_acc_mode == `MEM_MODE_HWORD) begin //half word access(unsigned)
-                w_reg_write_data = w_reg_write_data_from_mem_hword;
-            end
-            else if(w_dec_mem_acc_mode == `MEM_MODE_HWORD_SIGN) begin //half word access(signed)
-                w_reg_write_data = {{16{w_reg_write_data_from_mem_hword[15]}}, w_reg_write_data_from_mem_hword[15:0]};
-            end
-            else begin
-                w_reg_write_data = w_mem_data;
-            end
+    case(w_dec_reg_write_data_src)
+        `REG_WRITE_DATA_SRC_PC: begin
+            w_reg_write_data = w_return_pc;
         end
-        else begin
+        `REG_WRITE_DATA_SRC_MEM: begin
+            case(w_dec_mem_acc_mode)
+                `MEM_MODE_BYTE: begin //byte access(unsigned)
+                    w_reg_write_data = w_reg_write_data_from_mem_byte;
+                end
+                `MEM_MODE_BYTE_SIGN: begin //byte access(signed)
+                    w_reg_write_data = {{24{w_reg_write_data_from_mem_byte[7]}}, w_reg_write_data_from_mem_byte[7:0]};
+                end
+                `MEM_MODE_HWORD: begin //half word access(unsigned)
+                    w_reg_write_data = w_reg_write_data_from_mem_hword;
+                end
+                `MEM_MODE_HWORD_SIGN: begin //half word access(signed)
+                    w_reg_write_data = {{16{w_reg_write_data_from_mem_hword[15]}}, w_reg_write_data_from_mem_hword[15:0]};
+                end
+                default: begin
+                    w_reg_write_data = w_mem_data;
+                end
+            endcase
+        end
+        `REG_WRITE_DATA_SRC_RHI: begin
+            w_reg_write_data = 32'bx;
+        end
+        `REG_WRITE_DATA_SRC_RLO: begin
+            w_reg_write_data = 32'bx;
+        end
+        `REG_WRITE_DATA_SRC_ALU: begin
             w_reg_write_data = w_alu_result;
         end
-    end
+        default: begin
+            w_reg_write_data = 32'bx;
+        end
+    endcase
 end
 
 wire stage_refresh_n;
@@ -258,7 +265,6 @@ STAGE_REG_DE de(
     .in_data1(reg1),
     .in_dst_reg(fd_dst_reg),
     .in_dec_alu_src(fd_dec_alu_src),
-    .in_dec_mem_to_reg(fd_dec_mem_to_reg),
     .in_dec_reg_write(fd_dec_reg_write),
     .in_dec_mem_read(fd_dec_mem_read),
     .in_dec_mem_write(fd_dec_mem_write),
@@ -268,9 +274,9 @@ STAGE_REG_DE de(
     .in_dec_alu_op(fd_dec_alu_op),
     .in_ins(fd_ins_data),
     .in_dec_alu_result_to_pc(fd_dec_alu_result_to_pc),
-    .in_dec_pc_to_ra(fd_dec_pc_to_ra),
     .in_dec_reg_hi_write(fd_dec_reg_hi_write),
     .in_dec_reg_lo_write(fd_dec_reg_lo_write),
+    .in_dec_reg_write_data_src(fd_dec_reg_write_data_src),
     .next_pc(em_next_pc),
     .data0(em_reg0),
     .data1(em_reg1),
@@ -278,7 +284,6 @@ STAGE_REG_DE de(
     .ins(em_ins_data),
     .dec_alu_src(em_alu_src),
     .dec_alu_op(em_alu_op),
-    .dec_mem_to_reg(em_dec_mem_to_reg),
     .dec_reg_write(em_dec_reg_write),
     .dec_mem_read(em_dec_mem_read),
     .dec_mem_write(em_dec_mem_write),
@@ -286,9 +291,9 @@ STAGE_REG_DE de(
     .dec_branch(em_dec_branch),
     .dec_jmp(em_dec_jmp),
     .dec_alu_result_to_pc(em_dec_alu_result_to_pc),
-    .dec_pc_to_ra(em_dec_pc_to_ra),
     .dec_reg_hi_write(em_dec_reg_hi_write),
-    .dec_reg_lo_write(em_dec_reg_lo_write)
+    .dec_reg_lo_write(em_dec_reg_lo_write),
+    .dec_reg_write_data_src(em_dec_reg_write_data_src)
 );
 
 STAGE_REG_EM em(
@@ -301,7 +306,6 @@ STAGE_REG_EM em(
     .in_mem_write_data(em_reg1),
     .in_dst_reg(em_dst_reg),
     .in_ins(em_ins_data),
-    .in_dec_mem_to_reg(em_dec_mem_to_reg),
     .in_dec_reg_write(em_dec_reg_write),
     .in_dec_mem_read(em_dec_mem_read),
     .in_dec_mem_write(em_dec_mem_write),
@@ -310,17 +314,16 @@ STAGE_REG_EM em(
     .in_dec_jmp(em_dec_jmp),
     .in_alu_result_zero(em_alu_result_zero),
     .in_dec_alu_result_to_pc(em_dec_alu_result_to_pc),
-    .in_dec_pc_to_ra(em_dec_pc_to_ra),
     .in_dec_reg_hi_write(em_dec_reg_hi_write),
     .in_dec_reg_lo_write(em_dec_reg_lo_write),
     .in_alu_result_x64(em_alu_result_x64),
+    .in_dec_reg_write_data_src(em_dec_reg_write_data_src),
     .next_pc(_mw_next_pc),
     .branch_pc(mw_branch_pc),
     .alu_result(mw_alu_result),
     .mem_write_data(mw_mem_write_data),
     .dst_reg(mw_dst_reg),
     .ins(mw_ins_data),
-    .dec_mem_to_reg(mw_dec_mem_to_reg),
     .dec_reg_write(mw_dec_reg_write),
     .dec_mem_read(mw_dec_mem_read),
     .dec_mem_write(mw_dec_mem_write),
@@ -329,10 +332,10 @@ STAGE_REG_EM em(
     .dec_jmp(mw_dec_jmp),
     .alu_result_zero(mw_alu_result_zero),
     .dec_alu_result_to_pc(mw_dec_alu_result_to_pc),
-    .dec_pc_to_ra(mw_dec_pc_to_ra),
     .dec_reg_hi_write(mw_dec_reg_hi_write),
     .dec_reg_lo_write(mw_dec_reg_lo_write),
-    .alu_result_x64(mw_alu_result_x64)
+    .alu_result_x64(mw_alu_result_x64),
+    .dec_reg_write_data_src(mw_dec_reg_write_data_src)
 );
 
 STAGE_REG_MW mw(
@@ -344,17 +347,15 @@ STAGE_REG_MW mw(
     .in_dst_reg(mw_dst_reg),
     .in_return_pc(mw_return_pc),
     .in_dec_mem_acc_mode(mw_dec_mem_acc_mode),
-    .in_dec_mem_to_reg(mw_dec_mem_to_reg),
     .in_dec_reg_write(mw_dec_reg_write),
-    .in_dec_pc_to_ra(mw_dec_pc_to_ra),
+    .in_dec_reg_write_data_src(mw_dec_reg_write_data_src),
     .mem_data(w_mem_data),
     .alu_result(w_alu_result),
     .dst_reg(w_dst_reg),
     .dec_mem_acc_mode(w_dec_mem_acc_mode),
-    .dec_mem_to_reg(w_dec_mem_to_reg),
     .dec_reg_write(w_dec_reg_write),
     .return_pc(w_return_pc),
-    .dec_pc_to_ra(w_dec_pc_to_ra)
+    .dec_reg_write_data_src(w_dec_reg_write_data_src)
 );
 
 HILO_REGISTER hilo_reg(
@@ -385,7 +386,6 @@ DECODER dec(
     .func_code(fd_ins_data[5:0]),
     .alu_src(fd_dec_alu_src),
     .reg_dst(fd_dec_reg_dst),
-    .mem_to_reg(fd_dec_mem_to_reg),
     .reg_write(fd_dec_reg_write),
     .mem_read(fd_dec_mem_read),
     .mem_write(fd_dec_mem_write),
@@ -393,10 +393,10 @@ DECODER dec(
     .branch(fd_dec_branch),
     .jmp(fd_dec_jmp),
     .alu_op(fd_dec_alu_op),
-    .pc_to_ra(fd_dec_pc_to_ra),
     .alu_result_to_pc(fd_dec_alu_result_to_pc),
     .reg_hi_write(fd_dec_reg_hi_write),
-    .reg_lo_write(fd_dec_reg_lo_write)
+    .reg_lo_write(fd_dec_reg_lo_write),
+    .reg_write_data_src(fd_dec_reg_write_data_src)
 );
 
 ALU alu(

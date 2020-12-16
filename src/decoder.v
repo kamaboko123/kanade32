@@ -5,7 +5,6 @@ module DECODER(
     input [5:0] func_code,
     output reg reg_dst,
     output reg alu_src,
-    output reg mem_to_reg,
     output reg reg_write,
     output reg mem_read,
     output reg mem_write,
@@ -13,7 +12,7 @@ module DECODER(
     output reg branch,
     output reg jmp,
     output reg [3:0] alu_op,
-    output reg pc_to_ra,
+    output reg [2:0] reg_write_data_src,
     output reg alu_result_to_pc,
     output reg reg_hi_write,
     output reg reg_lo_write
@@ -22,7 +21,6 @@ module DECODER(
 always @* begin
     reg_dst = 1'b0;
     alu_src = 1'b0;
-    mem_to_reg = 1'b0;
     reg_write = 1'b0;
     mem_read = 1'b0;
     mem_write = 1'b0;
@@ -30,7 +28,7 @@ always @* begin
     branch = 1'b0;
     jmp = 1'b0;
     alu_op = 4'b000;
-    pc_to_ra = 1'b0;
+    reg_write_data_src = `REG_WRITE_DATA_SRC_ALU;
     alu_result_to_pc = 1'b0;
     reg_hi_write = 1'b0;
     reg_lo_write = 1'b0;
@@ -164,7 +162,8 @@ always @* begin
             jmp = 1'b1;
             reg_write = 1'b1;
             alu_op = `ALU_OP_OR;
-            pc_to_ra = 1'b1;
+            //pc_to_ra = 1'b1;
+            reg_write_data_src = `REG_WRITE_DATA_SRC_PC;
         end
         //beq
         6'b000100: begin
@@ -226,7 +225,7 @@ always @* begin
         //lw
         6'b100011: begin
             alu_src = 1'b1;
-            mem_to_reg = 1'b1;
+            reg_write_data_src = `REG_WRITE_DATA_SRC_MEM;
             reg_write = 1'b1;
             mem_read = 1'b1;
             alu_op = `ALU_OP_ADD;
@@ -234,7 +233,7 @@ always @* begin
         //lbu
         6'b100100: begin
             alu_src = 1'b1;
-            mem_to_reg = 1'b1;
+            reg_write_data_src = `REG_WRITE_DATA_SRC_MEM;
             reg_write = 1'b1;
             mem_read = 1'b1;
             alu_op = `ALU_OP_ADD;
@@ -243,7 +242,7 @@ always @* begin
         //lb
         6'b100000: begin
             alu_src = 1'b1;
-            mem_to_reg = 1'b1;
+            reg_write_data_src = `REG_WRITE_DATA_SRC_MEM;
             reg_write = 1'b1;
             mem_read = 1'b1;
             alu_op = `ALU_OP_ADD;
@@ -252,7 +251,7 @@ always @* begin
         //lhu
         6'b100101: begin
             alu_src = 1'b1;
-            mem_to_reg = 1'b1;
+            reg_write_data_src = `REG_WRITE_DATA_SRC_MEM;
             reg_write = 1'b1;
             mem_read = 1'b1;
             alu_op = `ALU_OP_ADD;
@@ -261,7 +260,7 @@ always @* begin
         //lh
         6'b100001: begin
             alu_src = 1'b1;
-            mem_to_reg = 1'b1;
+            reg_write_data_src = `REG_WRITE_DATA_SRC_MEM;
             reg_write = 1'b1;
             mem_read = 1'b1;
             alu_op = `ALU_OP_ADD;
