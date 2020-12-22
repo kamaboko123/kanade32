@@ -3,8 +3,8 @@
 bin/
 a.out
 test/results/
-test/asm/mem/
+test/asm/memdata/
 test/asm/mem/bin/
-test/c/mem/
+test/c/memdata/
 test/c/mem/bin/
 __pycache__/
