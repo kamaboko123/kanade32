@@ -1,0 +1,26 @@
+{
+  "cmd": {
+    "before_test": [
+      ["bash", "-c", "cd c; make"],
+      ["bash", "-c", "cd asm; make"]
+    ]
+  },
+  "tests": [
+    {
+      "mem": "test/c/memdata/fibonacci.mem",
+      "assert": {
+        "registers": {
+          "v0": "0x00000037"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/addi.mem",
+      "assert": {
+        "registers": {
+          "t0": "0x00000010"
+        }
+      }
+    }
+  ]
+}

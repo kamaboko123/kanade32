@@ -7,7 +7,8 @@ module REGFILE(
     input [4:0] w_reg0, //write select
     input [31:0] w_data, //write data
     output [31:0] reg0, //selected register data
-    output [31:0] reg1
+    output [31:0] reg1,
+    output [1023:0] regs
 );
 
 wire [31:0] _write_sel;
@@ -44,6 +45,8 @@ assign debug_gp = _r28_data;
 assign debug_sp = _r29_data;
 assign debug_fp = _r30_data;
 assign debug_ra = _r31_data;
+
+assign v0 = debug_v0;
 
 wire [31:0] _r0_data;
 wire [31:0] _r1_data;

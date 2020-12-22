@@ -1,7 +1,8 @@
 module KANADE32(
     input reset_n,
     input clk,
-    input clk_video
+    input clk_video,
+    output [1023:0] reg_debug
 );
 
 wire pc_wren;
@@ -381,7 +382,8 @@ REGFILE regfile(
     .w_reg0(w_dst_reg), //write selector
     .w_data(w_reg_write_data), //write data
     .reg0(reg0),
-    .reg1(reg1)
+    .reg1(reg1),
+    .regs(reg_debug)
 );
 
 DECODER dec(

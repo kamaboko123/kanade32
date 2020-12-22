@@ -2,4 +2,9 @@
 *.vcd
 bin/
 a.out
-
+test/results/
+test/asm/mem/
+test/asm/mem/bin/
+test/c/mem/
+test/c/mem/bin/
+__pycache__/

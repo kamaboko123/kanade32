@@ -17,7 +17,7 @@ $(OBJ): $(V_FILES) $(MEM_FILES)
 	@echo $(V_FILES)
 	@echo $(MEM_FILES)
 	mkdir -p $(TARGET_DIR)
-	$(IVERILOGR) -o $(OBJ) -s $(TOP) $(V_FILES)
+	$(IVERILOGR) -o $(OBJ) -s $(TOP) -DTEST_MEM_FILE=\"$(MEM_FILE)\" $(V_FILES)
 
 run: $(VCD_FILE)
 	gtkwave dump.vcd
