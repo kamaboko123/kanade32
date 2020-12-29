@@ -220,8 +220,8 @@ wire [63:0] w_hilo_data;
 wire [31:0] w_reg_write_data_from_mem_byte;
 wire [31:0] w_reg_write_data_from_mem_hword;
 //alu_resultがメモリアドレス、メモリからのデータは32bit固定なので、下位2bit指定されるバイト単位でデータを取り出す
-assign w_reg_write_data_from_mem_byte = (w_mem_data & (32'hFF << (w_alu_result[1:0] * 8))) >> w_alu_result[1:0] * 8;
-assign w_reg_write_data_from_mem_hword = (w_mem_data & (32'hFFFF << (w_alu_result[1] * 8))) >> w_alu_result[1] * 8;
+assign w_reg_write_data_from_mem_byte = (w_mem_data & (32'hFF000000 >> (w_alu_result[1:0] * 8))) >> -(w_alu_result[1:0] - 3) * 8;
+assign w_reg_write_data_from_mem_hword = (w_mem_data & (32'hFFFF0000 >> (w_alu_result[1] * 16))) >> -(w_alu_result[1] - 1) * 16;
 
 //レジスタに書き込むデータの生成
 always @* begin
