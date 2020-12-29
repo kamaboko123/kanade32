@@ -6,17 +6,15 @@ kanade32 supports some MIPS I instructions.
 
 ### Arithmetic
 
-- addi rt, rs, imm
+- addi[u] rt, rs, imm
   - rt = rs + imm
-- addiu rt, rs, imm
-  - rt = rs + imm
-- add rd, rs, rt
+- add[u] rd, rs, rt
   - rd = rs + rt
-- addu rd, rs, rt
-  - rd = rs + rt
-- sub rd, rs, rt
+- sub[u] rd, rs, rt
   - rd = rs - rt
 - or rd, rs, rt
+  - rd = rs | rt
+- ori rd, rs, rt
   - rd = rs | rt
 - and rd, rs, rt
   - rd = rs & rt

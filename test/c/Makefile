@@ -11,7 +11,7 @@ SRC = $(wildcard $(SRC_DIR)/*.c)
 OBJ = $(addprefix $(TARGET_DIR)/, $(notdir $(SRC:.c=.o)))
 BIN = $(addprefix $(TARGET_DIR)/, $(notdir $(SRC:.c=.bin)))
 MEM = $(addprefix $(MEMDATA_DIR)/, $(notdir $(SRC:.c=.mem)))
-CFLAGS = -O1 -mno-abicalls -fno-delayed-branch
+CFLAGS = -O1 -mno-abicalls -fno-delayed-branch -march=mips32 -mfp32
 
 .SECONDARY: $(BIN) $(OBJ)
 

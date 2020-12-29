@@ -60,7 +60,8 @@ wire [3:0] fd_dec_alu_op;
 wire fd_dec_reg_hi_write;
 wire fd_dec_reg_lo_write;
 wire [2:0] fd_dec_reg_write_data_src;
-
+wire fd_dec_imm_upper;
+wire fd_imm_sign_extend;
 
 //datapath decode -> execute
 wire [31:0] reg0;
@@ -85,6 +86,8 @@ wire em_dec_alu_result_to_pc;
 wire em_dec_reg_hi_write;
 wire em_dec_reg_lo_write;
 wire [2:0] em_dec_reg_write_data_src;
+wire em_dec_imm_upper;
+wire em_dec_imm_sign_extend;
 
 
 //datapath execute
@@ -92,11 +95,39 @@ wire [31:0] em_reg0;
 wire [31:0] em_reg1;
 wire [31:0] em_data0;
 wire [31:0] em_data1;
-wire [31:0] em_imm;
-assign em_imm =  { {16{em_ins_data[15]}}, em_ins_data[15:0]}; //immediate sign extend
+reg [31:0] em_imm;
+wire [31:0] em_imm_sign_extend;
+
+//assign em_imm =  { {16{em_ins_data[15]}}, em_ins_data[15:0]}; //immediate sign extend
 assign em_data0 = em_reg0;
 assign em_data1 = (em_alu_src == 0) ? (em_reg1) : (em_imm);
 wire [4:0] em_dst_reg;
+
+always @* begin
+    if(em_dec_branch) begin
+        em_imm = {{16{em_ins_data[15]}}, em_ins_data[15:0]};
+    end
+    else begin
+        case(em_dec_imm_upper)
+            1'b0:begin
+                case(em_dec_imm_sign_extend)
+                    1'b0:begin
+                        em_imm = {16'b0, em_ins_data[15:0]};
+                    end
+                    1'b1:begin
+                        em_imm = {{16{em_ins_data[15]}}, em_ins_data[15:0]};
+                    end
+                endcase
+                
+                //em_imm = {{16{em_ins_data[15]}}, em_ins_data[15:0]};
+            end
+            1'b1:begin
+                em_imm = {em_ins_data[15:0], 16'b0};
+            end
+        endcase
+    end
+end
+
 
 //datapath execute -> memory access
 wire [31:0] em_next_pc;
@@ -279,6 +310,8 @@ STAGE_REG_DE de(
     .in_dec_reg_hi_write(fd_dec_reg_hi_write),
     .in_dec_reg_lo_write(fd_dec_reg_lo_write),
     .in_dec_reg_write_data_src(fd_dec_reg_write_data_src),
+    .in_dec_imm_upper(fd_dec_imm_upper),
+    .in_dec_imm_sign_extend(fd_dec_imm_sign_extend),
     .next_pc(em_next_pc),
     .data0(em_reg0),
     .data1(em_reg1),
@@ -295,7 +328,9 @@ STAGE_REG_DE de(
     .dec_alu_result_to_pc(em_dec_alu_result_to_pc),
     .dec_reg_hi_write(em_dec_reg_hi_write),
     .dec_reg_lo_write(em_dec_reg_lo_write),
-    .dec_reg_write_data_src(em_dec_reg_write_data_src)
+    .dec_reg_write_data_src(em_dec_reg_write_data_src),
+    .dec_imm_upper(em_dec_imm_upper),
+    .dec_imm_sign_extend(em_dec_imm_sign_extend)
 );
 
 STAGE_REG_EM em(
@@ -401,7 +436,9 @@ DECODER dec(
     .alu_result_to_pc(fd_dec_alu_result_to_pc),
     .reg_hi_write(fd_dec_reg_hi_write),
     .reg_lo_write(fd_dec_reg_lo_write),
-    .reg_write_data_src(fd_dec_reg_write_data_src)
+    .reg_write_data_src(fd_dec_reg_write_data_src),
+    .imm_upper(fd_dec_imm_upper),
+    .imm_sign_extend(fd_dec_imm_sign_extend)
 );
 
 ALU alu(

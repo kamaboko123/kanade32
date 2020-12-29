@@ -15,7 +15,9 @@ module DECODER(
     output reg [2:0] reg_write_data_src,
     output reg alu_result_to_pc,
     output reg reg_hi_write,
-    output reg reg_lo_write
+    output reg reg_lo_write,
+    output reg imm_upper,
+    output reg imm_sign_extend
 );
 
 always @* begin
@@ -32,6 +34,8 @@ always @* begin
     alu_result_to_pc = 1'b0;
     reg_hi_write = 1'b0;
     reg_lo_write = 1'b0;
+    imm_upper = 1'b0;
+    imm_sign_extend = 1'b0;
     
     case(ins_op)
         6'b000000: begin
@@ -191,12 +195,14 @@ always @* begin
             alu_src = 1'b1;
             reg_write = 1'b1;
             alu_op = `ALU_OP_ADD;
+            imm_sign_extend = 1'b1;
         end
         //addiu(li)
         6'b001001: begin
             alu_src = 1'b1;
             reg_write = 1'b1;
             alu_op = `ALU_OP_ADD;
+            imm_sign_extend = 1'b1;
         end
         //andi
         6'b001100: begin
@@ -293,6 +299,13 @@ always @* begin
             mem_write = 1'b1;
             alu_op = `ALU_OP_ADD;
             mem_acc_mode = `MEM_MODE_HWORD;
+        end
+        //lui
+        6'b001111: begin
+            alu_src = 1'b1;
+            reg_write = 1'b1;
+            alu_op = `ALU_OP_ADD;
+            imm_upper = 1'b1;
         end
     endcase
 end
