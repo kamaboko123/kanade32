@@ -96,6 +96,117 @@
           "t1": "0x000000b3"
         }
       }
+    },
+    {
+      "mem": "test/asm/memdata/or.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "t0": "0x00000090",
+          "t1": "0x00000033",
+          "t2": "0x000000b3"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/andi.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "t0": "0x00000090",
+          "t1": "0x00000010"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/nor.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "t0": "0x00000090",
+          "t1": "0x00000033",
+          "t2": "0xffffff4c"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/xor.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "t0": "0x00000090",
+          "t1": "0x00000033",
+          "t2": "0x000000a3"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/xori.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "t0": "0x00000090",
+          "t1": "0x000000a3"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/j.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "v0": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/beq.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "t0": "0x000000f1",
+          "t1": "0x000000f1",
+          "t2": "0x000000f0",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/bne.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "t0": "0x000000f1",
+          "t1": "0x000000f0",
+          "t2": "0x000000f1",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/load.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["t0", "t3", "t4"],
+        "registers": {
+          "t1": "0x11223344",
+          "t2": "0x55667788",
+          "t5": "0x00000011",
+          "t6": "0x00000022",
+          "t7": "0x00000033",
+          "t8": "0x00000044"
+        }
+      }
     }
   ]
 }
