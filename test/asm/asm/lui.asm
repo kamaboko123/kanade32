@@ -1,0 +1,4 @@
+
+.text
+lui $t0, 0x10
+lui $t1, 0xffff
