@@ -220,8 +220,8 @@ wire [63:0] w_hilo_data;
 wire [31:0] w_reg_write_data_from_mem_byte;
 wire [31:0] w_reg_write_data_from_mem_hword;
 //alu_resultがメモリアドレス、メモリからのデータは32bit固定なので、下位2bit指定されるバイト単位でデータを取り出す
-assign w_reg_write_data_from_mem_byte = (w_mem_data & (32'hFF000000 >> (w_alu_result[1:0] * 8))) >> -(w_alu_result[1:0] - 3) * 8;
-assign w_reg_write_data_from_mem_hword = (w_mem_data & (32'hFFFF0000 >> (w_alu_result[1] * 16))) >> -(w_alu_result[1] - 1) * 16;
+assign w_reg_write_data_from_mem_byte = (w_mem_data & (32'hFF000000 >> (w_alu_result[1:0] * 8))) >> (3 - w_alu_result[1:0]) * 8;
+assign w_reg_write_data_from_mem_hword = (w_mem_data & (32'hFFFF0000 >> (w_alu_result[1] * 16))) >> (1 - w_alu_result[1]) * 16;
 
 //レジスタに書き込むデータの生成
 always @* begin
@@ -501,12 +501,12 @@ reg [3:0] ram_byteen;
 always @* begin
     if(mem_wren == 1'b1) begin //store
         if(mw_dec_mem_acc_mode == `MEM_MODE_BYTE) begin //byte
-            ram_write_data = mw_mem_write_data << (ram_addr[1:0] * 8);
-            ram_byteen = 4'b1 << ram_addr[1:0];
+            ram_write_data = mw_mem_write_data << ((3 - ram_addr[1:0]) * 8);
+            ram_byteen = 4'b1000 >> ram_addr[1:0];
         end
         else if(mw_dec_mem_acc_mode == `MEM_MODE_HWORD) begin //short
-            ram_write_data = mw_mem_write_data << (ram_addr[1:0] * 8);
-            ram_byteen = 4'b11 << ram_addr[1:0];
+            ram_write_data = mw_mem_write_data << ((1 - ram_addr[1]) * 16);
+            ram_byteen = 4'b1100 >> ram_addr[1:0];
         end
         else begin//word
             ram_write_data = mw_mem_write_data;
