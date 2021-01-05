@@ -30,6 +30,20 @@ kanade32 supports some MIPS I instructions.
   - rd = rs ^ rt
 - xor rt, rs, imm
   - rt = rs ^ imm
+- lui rt, imm
+  - Rt[31:16] = imm
+
+### Multiply
+
+- mult[u] rs, rt
+  - hi:lo = rs \* rt
+- div[u] $zero, rs, rt
+  - lo = rs / rt;
+  - hi = rs % rt
+- mfhi rd
+  - rd = hi
+- mflo rd
+  - rd = lo
 
 ### Jump
 
@@ -73,11 +87,7 @@ kanade32 supports some MIPS I instructions.
 
 ## WIP
 
-- lui
-  - need to implement immediate shifter
-- (Multiply)
-  - need to implement multiply and divide unit
-  - need to implement HI/LO registers
+- mthi, htlo
 - bltzal
   - need to implement full instructions input for DECODER module to identify bltz and bltzal
 - bge, bgez, bgezal, bgtz

@@ -166,6 +166,29 @@
       }
     },
     {
+      "mem": "test/asm/memdata/jr.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["t0"],
+        "registers": {
+          "v0": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/jal.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["ra"],
+        "registers": {
+          "t0": "0x00000010",
+          "t1": "0x00000010",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
       "mem": "test/asm/memdata/beq.mem",
       "clk": 100000,
       "assert": {
@@ -226,6 +249,43 @@
           "t6": "0x00007788",
           "k0": "0x11223344",
           "k1": "0x55667788"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/lui.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "t0": "0x00100000",
+          "t1": "0xffff0000"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/mult.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "t0": "0x00550000",
+          "t1": "0x00000400",
+          "t2": "0x00000001",
+          "t3": "0x54000000"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/div.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "t0": "0x00550000",
+          "t1": "0x00000033",
+          "t2": "0x00000022",
+          "t3": "0x0001aaaa"
         }
       }
     }

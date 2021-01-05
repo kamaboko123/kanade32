@@ -89,12 +89,12 @@ always @* begin
             x64 = a * b;
         end
         `ALU_OP_DIV: begin
-            x64[63:32] = a / b;
-            x64[31:0] = a % b;
+            x64[63:32] = a % b;
+            x64[31:0] = a / b;
         end
         `ALU_OP_DIVU: begin
-            x64[63:32] = a / b;
-            x64[31:0] = a % b;
+            x64[63:32] = a % b;
+            x64[31:0] = a / b;
         end
         default: begin
             x64 = 64'b0;
