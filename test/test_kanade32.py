@@ -45,6 +45,15 @@ def test_mips(testdata):
     result = subprocess.check_output(cmd, env={"MEM_FILE": mem_file, "SIM_CLK": sim_clk})
     reg_dumps = collect_registers(result)
 
+    print("---")
+    print("%s" % testdata["mem"])
+    print("[reg dumps]")
+    print(reg_dumps)
+    print("")
+    print(print("[expected regs]"))
+    print(expected_regs)
+    print("---")
+
     for reg_name in expected_regs.keys():
         assert reg_dumps[reg_name] == expected_regs[reg_name]
     

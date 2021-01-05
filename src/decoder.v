@@ -185,7 +185,7 @@ always @* begin
             branch = 1'b1;
             alu_op = `ALU_OP_SUB_NOT;
         end
-        //ble
+        //blez
         6'b000110: begin
             branch = 1'b1;
             alu_op = `ALU_OP_SLE_S;

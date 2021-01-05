@@ -1,8 +1,8 @@
 {
   "cmd": {
     "before_test": [
-      ["bash", "-c", "cd c; make"],
-      ["bash", "-c", "cd asm; make"]
+      ["bash", "-c", "cd c; make clean; make"],
+      ["bash", "-c", "cd asm; make clean; make"]
     ]
   },
   "tests": [
@@ -211,6 +211,114 @@
           "t0": "0x000000f1",
           "t1": "0x000000f0",
           "t2": "0x000000f1",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/ble_less.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["at"],
+        "registers": {
+          "t0": "0x000000f0",
+          "t1": "0x000000f1",
+          "t2": "0x000000ef",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/ble_eq.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["at"],
+        "registers": {
+          "t0": "0x000000f1",
+          "t1": "0x000000f1",
+          "t2": "0x000000ef",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/blez_zero.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["at"],
+        "registers": {
+          "t0": "0x00000000",
+          "t1": "0x00000001",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/blez_neg.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["at"],
+        "registers": {
+          "t0": "0xffff8000",
+          "t1": "0x00000001",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/blt1.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["at"],
+        "registers": {
+          "t0": "0x000000f0",
+          "t1": "0x000000f1",
+          "t2": "0x000000ef",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/blt2.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["at"],
+        "registers": {
+          "t0": "0x000000f0",
+          "t1": "0x000000f1",
+          "t2": "0x000000f0",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/bltz_neg.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["at"],
+        "registers": {
+          "t0": "0xffff8000",
+          "t1": "0x00000001",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/bltz_zero.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["at"],
+        "registers": {
+          "t0": "0xffff8000",
+          "t1": "0x00000000",
           "v0": "0x00000020",
           "v1": "0x00000020"
         }
