@@ -32,6 +32,14 @@ kanade32 supports some MIPS I instructions.
   - rt = rs ^ imm
 - lui rt, imm
   - Rt[31:16] = imm
+- sll rd, rt, imm
+  - rd = rt << imm
+- sllv rd, rt, rs
+  - rd = rt << rs
+- srl rd, rt, imm
+  - rd = rt << imm
+- srlv rd, rt, rs
+  - rd = rt << rs
 
 ### Multiply
 

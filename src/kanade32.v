@@ -57,7 +57,7 @@ wire [2:0] fd_dec_mem_acc_mode;
 wire fd_dec_branch;
 wire fd_dec_jmp;
 wire fd_dec_alu_result_to_pc;
-wire [3:0] fd_dec_alu_op;
+wire [4:0] fd_dec_alu_op;
 wire fd_dec_reg_hi_write;
 wire fd_dec_reg_lo_write;
 wire [2:0] fd_dec_reg_write_data_src;
@@ -74,7 +74,7 @@ wire [31:0] de_ins_data;
 wire em_wren;
 wire em_dec_alu_src_a;
 wire em_dec_alu_src_b;
-wire [3:0] em_alu_op;
+wire [4:0] em_alu_op;
 
 //control execute -> memory access
 wire em_alu_result_zero;

@@ -1,5 +1,5 @@
 module ALU(
-    input [3:0] op,
+    input [4:0] op,
     input [31:0] a,
     input [31:0] b,
     output reg [31:0] x, //result
@@ -98,6 +98,15 @@ always @* begin
         end
         `ALU_OP_SLL_IMM: begin
             x = a << b[10:6];
+        end
+        `ALU_OP_SRL_IMM: begin
+            x = a >> b[10:6];
+        end
+        `ALU_OP_SLL: begin
+            x = b << a;
+        end
+        `ALU_OP_SRL: begin
+            x = b >> a;
         end
         default: begin
             x64 = 64'b0;

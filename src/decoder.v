@@ -12,7 +12,7 @@ module DECODER(
     output reg [2:0] mem_acc_mode,
     output reg branch,
     output reg jmp,
-    output reg [3:0] alu_op,
+    output reg [4:0] alu_op,
     output reg [2:0] reg_write_data_src,
     output reg alu_result_to_pc,
     output reg reg_hi_write,
@@ -164,7 +164,30 @@ always @* begin
                     reg_write = 1'b1;
                     alu_op = `ALU_OP_SLL_IMM;
                 end
-                
+                //srl
+                6'b000010: begin
+                    alu_src_a = `ALU_SRC_A_RT;
+                    alu_src_b = `ALU_SRC_B_IMM;
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_SRL_IMM;
+                end
+                //sllv
+                6'b000100: begin
+                    alu_src_a = `ALU_SRC_A_RS;
+                    alu_src_b = `ALU_SRC_B_RT;
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_SLL;
+                end
+                //srlv
+                6'b000110: begin
+                    alu_src_a = `ALU_SRC_A_RS;
+                    alu_src_b = `ALU_SRC_B_RT;
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_SRL;
+                end
             endcase
         end
         //blt
