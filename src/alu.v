@@ -96,6 +96,9 @@ always @* begin
             x64[63:32] = a % b;
             x64[31:0] = a / b;
         end
+        `ALU_OP_SLL_IMM: begin
+            x = a << b[10:6];
+        end
         default: begin
             x64 = 64'b0;
         end

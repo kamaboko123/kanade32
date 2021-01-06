@@ -48,7 +48,8 @@ wire de_wren;
 wire fd_dec_reg_dst; //0 = rt, 1 = rd
 
 //control decode -> execute
-wire fd_dec_alu_src;
+wire fd_dec_alu_src_a;
+wire fd_dec_alu_src_b;
 wire fd_dec_reg_write;
 wire fd_dec_mem_read;
 wire fd_dec_mem_write;
@@ -71,7 +72,8 @@ wire [31:0] de_ins_data;
 
 //contorl execute
 wire em_wren;
-wire em_dec_alu_src;
+wire em_dec_alu_src_a;
+wire em_dec_alu_src_b;
 wire [3:0] em_alu_op;
 
 //control execute -> memory access
@@ -93,14 +95,34 @@ wire em_dec_imm_sign_extend;
 //datapath execute
 wire [31:0] em_reg0;
 wire [31:0] em_reg1;
-wire [31:0] em_data0;
-wire [31:0] em_data1;
+reg [31:0] em_data0;
+reg [31:0] em_data1;
 reg [31:0] em_imm;
 wire [31:0] em_imm_sign_extend;
 
 //assign em_imm =  { {16{em_ins_data[15]}}, em_ins_data[15:0]}; //immediate sign extend
-assign em_data0 = em_reg0;
-assign em_data1 = (em_alu_src == 0) ? (em_reg1) : (em_imm);
+//assign em_data0 = em_reg0;
+//assign em_data1 = (em_alu_src_b == 0) ? (em_reg1) : (em_imm);
+always @* begin
+    case(em_alu_src_a)
+        `ALU_SRC_A_RS: begin
+            em_data0 = em_reg0; //rt
+        end
+        `ALU_SRC_A_RT: begin
+            em_data0 = em_reg1;
+        end
+    endcase
+end
+always @* begin
+    case(em_alu_src_b)
+        `ALU_SRC_B_RT: begin
+            em_data1 = em_reg1; //rt
+        end
+        `ALU_SRC_B_IMM: begin
+            em_data1 = em_imm;
+        end
+    endcase
+end
 wire [4:0] em_dst_reg;
 
 always @* begin
@@ -297,7 +319,8 @@ STAGE_REG_DE de(
     .in_data0(reg0),
     .in_data1(reg1),
     .in_dst_reg(fd_dst_reg),
-    .in_dec_alu_src(fd_dec_alu_src),
+    .in_dec_alu_src_a(fd_dec_alu_src_a),
+    .in_dec_alu_src_b(fd_dec_alu_src_b),
     .in_dec_reg_write(fd_dec_reg_write),
     .in_dec_mem_read(fd_dec_mem_read),
     .in_dec_mem_write(fd_dec_mem_write),
@@ -317,7 +340,8 @@ STAGE_REG_DE de(
     .data1(em_reg1),
     .dst_reg(em_dst_reg),
     .ins(em_ins_data),
-    .dec_alu_src(em_alu_src),
+    .dec_alu_src_a(em_alu_src_a),
+    .dec_alu_src_b(em_alu_src_b),
     .dec_alu_op(em_alu_op),
     .dec_reg_write(em_dec_reg_write),
     .dec_mem_read(em_dec_mem_read),
@@ -424,7 +448,8 @@ REGFILE regfile(
 DECODER dec(
     .ins_op(fd_ins_data[31:26]),
     .func_code(fd_ins_data[5:0]),
-    .alu_src(fd_dec_alu_src),
+    .alu_src_a(fd_dec_alu_src_a),
+    .alu_src_b(fd_dec_alu_src_b),
     .reg_dst(fd_dec_reg_dst),
     .reg_write(fd_dec_reg_write),
     .mem_read(fd_dec_mem_read),

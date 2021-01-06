@@ -35,7 +35,8 @@ module STAGE_REG_DE(
     input [31:0] in_data1,
     input [4:0] in_dst_reg,
     input [31:0] in_ins,
-    input in_dec_alu_src,
+    input in_dec_alu_src_a,
+    input in_dec_alu_src_b,
     input in_dec_reg_write,
     input in_dec_mem_read,
     input in_dec_mem_write,
@@ -54,7 +55,8 @@ module STAGE_REG_DE(
     output reg [31:0] data1,
     output reg [4:0] dst_reg,
     output reg [31:0] ins,
-    output reg dec_alu_src,
+    output reg dec_alu_src_a,
+    output reg dec_alu_src_b,
     output reg dec_reg_write,
     output reg dec_mem_read,
     output reg dec_mem_write,
@@ -77,7 +79,8 @@ always @(posedge clk) begin
         data1 <= 0;
         dst_reg <= 0;
         ins <= 0;
-        dec_alu_src <= 0;
+        dec_alu_src_a <= 0;
+        dec_alu_src_b <= 0;
         dec_reg_write <= 0;
         dec_mem_read <= 0;
         dec_mem_write <= 0;
@@ -99,7 +102,8 @@ always @(posedge clk) begin
         dst_reg <= in_dst_reg;
         ins <= in_ins;
         
-        dec_alu_src <= in_dec_alu_src;
+        dec_alu_src_a <= in_dec_alu_src_a;
+        dec_alu_src_b <= in_dec_alu_src_b;
         dec_reg_write <= in_dec_reg_write;
         dec_mem_read <= in_dec_mem_read;
         dec_mem_write <= in_dec_mem_write;

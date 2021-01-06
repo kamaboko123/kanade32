@@ -4,7 +4,8 @@ module DECODER(
     input [5:0] ins_op,
     input [5:0] func_code,
     output reg reg_dst,
-    output reg alu_src,
+    output reg alu_src_a,
+    output reg alu_src_b,
     output reg reg_write,
     output reg mem_read,
     output reg mem_write,
@@ -22,7 +23,8 @@ module DECODER(
 
 always @* begin
     reg_dst = 1'b0;
-    alu_src = 1'b0;
+    alu_src_a = `ALU_SRC_A_RS;
+    alu_src_b = `ALU_SRC_B_RT;
     reg_write = 1'b0;
     mem_read = 1'b0;
     mem_write = 1'b0;
@@ -153,6 +155,16 @@ always @* begin
                     alu_op = `ALU_OP_ADD;
                     reg_write_data_src = `REG_WRITE_DATA_SRC_RHI;
                 end
+                
+                //sll
+                6'b000000: begin
+                    alu_src_a = `ALU_SRC_A_RT;
+                    alu_src_b = `ALU_SRC_B_IMM;
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_SLL_IMM;
+                end
+                
             endcase
         end
         //blt
@@ -192,51 +204,52 @@ always @* begin
         end
         //addi
         6'b001000: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             reg_write = 1'b1;
             alu_op = `ALU_OP_ADD;
             imm_sign_extend = 1'b1;
         end
         //addiu(li)
         6'b001001: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             reg_write = 1'b1;
             alu_op = `ALU_OP_ADD;
             imm_sign_extend = 1'b1;
         end
         //andi
         6'b001100: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             reg_write = 1'b1;
             alu_op = `ALU_OP_AND;
         end
         //ori
         6'b001101: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             reg_write = 1'b1;
             alu_op = `ALU_OP_OR;
         end
         //slti
         6'b001010: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             reg_write = 1'b1;
             alu_op = `ALU_OP_SLT_S;
         end
         //sltiu
         6'b001011: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             reg_write = 1'b1;
             alu_op = `ALU_OP_SLT;
         end
         //xori
         6'b001110: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             reg_write = 1'b1;
             alu_op = `ALU_OP_XOR;
         end
+
         //lw
         6'b100011: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             reg_write_data_src = `REG_WRITE_DATA_SRC_MEM;
             reg_write = 1'b1;
             mem_read = 1'b1;
@@ -244,7 +257,7 @@ always @* begin
         end
         //lbu
         6'b100100: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             reg_write_data_src = `REG_WRITE_DATA_SRC_MEM;
             reg_write = 1'b1;
             mem_read = 1'b1;
@@ -253,7 +266,7 @@ always @* begin
         end
         //lb
         6'b100000: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             reg_write_data_src = `REG_WRITE_DATA_SRC_MEM;
             reg_write = 1'b1;
             mem_read = 1'b1;
@@ -262,7 +275,7 @@ always @* begin
         end
         //lhu
         6'b100101: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             reg_write_data_src = `REG_WRITE_DATA_SRC_MEM;
             reg_write = 1'b1;
             mem_read = 1'b1;
@@ -271,7 +284,7 @@ always @* begin
         end
         //lh
         6'b100001: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             reg_write_data_src = `REG_WRITE_DATA_SRC_MEM;
             reg_write = 1'b1;
             mem_read = 1'b1;
@@ -281,28 +294,28 @@ always @* begin
 
         //sw
         6'b101011: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             mem_write = 1'b1;
             alu_op = `ALU_OP_ADD;
             mem_acc_mode = `MEM_MODE_WORD;
         end
         //sb
         6'b101000: begin
-            alu_src = 1'b1;
+            alu_src_b =`ALU_SRC_B_IMM;
             mem_write = 1'b1;
             alu_op = `ALU_OP_ADD;
             mem_acc_mode = `MEM_MODE_BYTE;
         end
         //sh
         6'b101001: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             mem_write = 1'b1;
             alu_op = `ALU_OP_ADD;
             mem_acc_mode = `MEM_MODE_HWORD;
         end
         //lui
         6'b001111: begin
-            alu_src = 1'b1;
+            alu_src_b = `ALU_SRC_B_IMM;
             reg_write = 1'b1;
             alu_op = `ALU_OP_ADD;
             imm_upper = 1'b1;

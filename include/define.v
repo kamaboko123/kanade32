@@ -22,6 +22,13 @@
 `define ALU_OP_MULTU 4'b1011
 `define ALU_OP_DIV 4'b1100
 `define ALU_OP_DIVU 4'b1101
+`define ALU_OP_SLL_IMM 4'b1110
+
+`define ALU_SRC_A_RS 1'b0
+`define ALU_SRC_A_RT 1'b1
+
+`define ALU_SRC_B_RT 1'b0
+`define ALU_SRC_B_IMM 1'b1
 
 `define MEM_MODE_WORD 3'b000
 `define MEM_MODE_HWORD 3'b001

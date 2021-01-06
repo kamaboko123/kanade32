@@ -396,6 +396,17 @@
           "t3": "0x0001aaaa"
         }
       }
+    },
+    {
+      "mem": "test/asm/memdata/sll.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "t0": "0x0000000d",
+          "t1": "0x00000034"
+        }
+      }
     }
   ]
 }
