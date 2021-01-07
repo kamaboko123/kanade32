@@ -71,12 +71,20 @@ kanade32 supports some MIPS I instructions.
   - if(rs != rt) pc += (offset \* 4)
 - ble rs, rt, offset
   - if(rs <= rt) pc += (offset \* 4)
+  - **pseudo instructions** slt + beq
 - blez rs, offset
   - if(rs <= 0) pc += (offset \* 4)
 - blt rs, rt, offset
   - if(rs < rt) pc += (offset \* 4)
+  - **pseudo instructions** slt + bne
 - bltz rs, offset
   - if(rs < 0) pc += (offset \* 4)
+- bge rs, rt, offset
+  - if(rs >= rt) pc += (offset \* 4)
+  - **pseudo instructions** slt + beq
+- bgt rs, rt, offset
+  - if(rs > rt) pc += (offset \* 4)
+  - **pseudo instructions** slt + bne
 
 ### Memory Access
 
@@ -92,11 +100,12 @@ kanade32 supports some MIPS I instructions.
 ## Reference of MIPS instructions
 
 [MIPS Reference Sheet](http://www2.engr.arizona.edu/~ece369/Resources/spim/MIPSReference.pdf)
+[MIPS Instruction Set](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-Instruction-Set)
 
 ## WIP
 
 - mthi, htlo
-- bltzal
+- bltzal, bgezal
   - need to implement full instructions input for DECODER module to identify bltz and bltzal
-- bge, bgez, bgezal, bgtz
+- bgez, bgtz
   - need to enhance comparator in ALU

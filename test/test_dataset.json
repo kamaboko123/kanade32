@@ -325,6 +325,62 @@
       }
     },
     {
+      "mem": "test/asm/memdata/bge_greater.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["at"],
+        "registers": {
+          "t0": "0x000000f1",
+          "t1": "0x000000f0",
+          "t2": "0x000000f2",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/bge_eq.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["at"],
+        "registers": {
+          "t0": "0x000000f1",
+          "t1": "0x000000f1",
+          "t2": "0x000000f2",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/bgt1.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["at"],
+        "registers": {
+          "t0": "0x000000f1",
+          "t1": "0x000000f0",
+          "t2": "0x000000f2",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
+      "mem": "test/asm/memdata/bgt2.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": ["at"],
+        "registers": {
+          "t0": "0x000000f1",
+          "t1": "0x000000f0",
+          "t2": "0x000000f1",
+          "v0": "0x00000020",
+          "v1": "0x00000020"
+        }
+      }
+    },
+    {
       "mem": "test/asm/memdata/load.mem",
       "clk": 100000,
       "assert": {
