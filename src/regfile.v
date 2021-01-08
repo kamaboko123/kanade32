@@ -80,7 +80,6 @@ wire [31:0] _r28_data;
 wire [31:0] _r29_data;
 wire [31:0] _r30_data;
 wire [31:0] _r31_data;
-wire [1023:0] regs;
 
 assign regs = {
     _r31_data,

@@ -7,8 +7,9 @@
   },
   "tests": [
     {
+      "enable": true,
       "mem": "test/c/memdata/fibonacci.mem",
-      "clk": 1000000,
+      "clk": 2000000,
       "assert": {
         "ignore_regs": [
           "at",
@@ -48,6 +49,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/addi.mem",
       "clk": 100000,
       "assert": {
@@ -61,6 +63,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/add.mem",
       "clk": 100000,
       "assert": {
@@ -74,6 +77,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/sub.mem",
       "clk": 100000,
       "assert": {
@@ -87,6 +91,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/ori.mem",
       "clk": 100000,
       "assert": {
@@ -98,6 +103,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/or.mem",
       "clk": 100000,
       "assert": {
@@ -110,6 +116,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/andi.mem",
       "clk": 100000,
       "assert": {
@@ -121,6 +128,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/nor.mem",
       "clk": 100000,
       "assert": {
@@ -133,6 +141,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/xor.mem",
       "clk": 100000,
       "assert": {
@@ -145,6 +154,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/xori.mem",
       "clk": 100000,
       "assert": {
@@ -156,6 +166,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/j.mem",
       "clk": 100000,
       "assert": {
@@ -166,6 +177,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/jr.mem",
       "clk": 100000,
       "assert": {
@@ -176,6 +188,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/jal.mem",
       "clk": 100000,
       "assert": {
@@ -189,6 +202,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/beq.mem",
       "clk": 100000,
       "assert": {
@@ -203,6 +217,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/bne.mem",
       "clk": 100000,
       "assert": {
@@ -217,6 +232,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/ble_less.mem",
       "clk": 100000,
       "assert": {
@@ -231,6 +247,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/ble_eq.mem",
       "clk": 100000,
       "assert": {
@@ -245,6 +262,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/blez_zero.mem",
       "clk": 100000,
       "assert": {
@@ -258,6 +276,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/blez_neg.mem",
       "clk": 100000,
       "assert": {
@@ -271,6 +290,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/blt1.mem",
       "clk": 100000,
       "assert": {
@@ -285,6 +305,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/blt2.mem",
       "clk": 100000,
       "assert": {
@@ -299,6 +320,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/bltz_neg.mem",
       "clk": 100000,
       "assert": {
@@ -312,6 +334,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/bltz_zero.mem",
       "clk": 100000,
       "assert": {
@@ -325,6 +348,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/bge_greater.mem",
       "clk": 100000,
       "assert": {
@@ -339,6 +363,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/bge_eq.mem",
       "clk": 100000,
       "assert": {
@@ -353,6 +378,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/bgt1.mem",
       "clk": 100000,
       "assert": {
@@ -367,6 +393,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/bgt2.mem",
       "clk": 100000,
       "assert": {
@@ -381,6 +408,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/load.mem",
       "clk": 100000,
       "assert": {
@@ -400,6 +428,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/store.mem",
       "clk": 100000,
       "assert": {
@@ -417,6 +446,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/lui.mem",
       "clk": 100000,
       "assert": {
@@ -428,6 +458,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/mult.mem",
       "clk": 100000,
       "assert": {
@@ -441,6 +472,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/div.mem",
       "clk": 100000,
       "assert": {
@@ -454,6 +486,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/sll.mem",
       "clk": 100000,
       "assert": {
@@ -465,6 +498,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/srl.mem",
       "clk": 100000,
       "assert": {
@@ -476,6 +510,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/sllv.mem",
       "clk": 100000,
       "assert": {
@@ -488,6 +523,7 @@
       }
     },
     {
+      "enable": true,
       "mem": "test/asm/memdata/srlv.mem",
       "clk": 100000,
       "assert": {

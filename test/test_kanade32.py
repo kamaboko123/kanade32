@@ -36,6 +36,8 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize('testdata', pytest.CONFIG["tests"])
 
 def test_mips(testdata):
+    if not testdata["enable"]:
+        return
     mem_file = testdata["mem"]
     sim_clk = str(testdata["clk"])
     expected_regs = testdata["assert"]["registers"]

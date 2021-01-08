@@ -2,7 +2,12 @@ module KANADE32(
     input reset_n,
     input clk,
     input clk_video,
-    output [1023:0] reg_debug
+    output [1023:0] reg_debug,
+    output vga_sync_h,
+    output vga_sync_v,
+    output [3:0] vga_r,
+    output [3:0] vga_g,
+    output [3:0] vga_b
 );
 
 wire pc_wren;
@@ -491,23 +496,32 @@ PC pc(
     .pc_data(pc_data)
 );
 
-wire sync_h;
-wire sync_v;
+
 wire [31:0] vram_data;
 reg [3:0] vram_data_px;
 wire [9:0] v_x;
 wire [9:0] v_y;
 wire [19:0] vram_addr;
 wire [29:0] vram_addr_mem;
+//vramのアドレス(0始まり)
 assign vram_addr = (v_y[8:0] * 320) + (v_x[8:0]);
-assign vram_addr_mem = ({14'h1, vram_addr[17:2]});
+//メモリアクセス時のアドレス 1 + vram_addr(16bit) = 0x0001****
+//メモリへのアクセスは32bit(4byte)単位でアクセスするので、下4bitは切り捨てる
+assign vram_addr_mem = ({14'h1, vram_addr[18:3]});
 
-always @(vram_addr[1:0]) begin
-    case(vram_addr[1:0])
-        0: vram_data_px = vram_data[3:0];
-        1: vram_data_px = vram_data[7:4];
-        2: vram_data_px = vram_data[11:8];
-        3: vram_data_px = vram_data[15:12];
+
+//1pxは16色 4bitで表現する
+//VRAMのデータは4byte単位のアクセスなので、下4bitによって取り出す4bitを決める。
+always @(vram_addr[2:0]) begin
+    case(vram_addr[2:0])
+        3'b000: vram_data_px = vram_data[3:0];
+        3'b001: vram_data_px = vram_data[7:4];
+        3'b010: vram_data_px = vram_data[11:8];
+        3'b011: vram_data_px = vram_data[15:12];
+        3'b100: vram_data_px = vram_data[19:16];
+        3'b101: vram_data_px = vram_data[23:20];
+        3'b110: vram_data_px = vram_data[27:24];
+        3'b111: vram_data_px = vram_data[31:28];
     endcase
 end
 
@@ -518,7 +532,10 @@ VGA vga(
     .sync_h(sync_h),
     .sync_v(sync_v),
     .v_x(v_x),
-    .v_y(v_y)
+    .v_y(v_y),
+    .r(vga_r),
+    .g(vga_g),
+    .b(vga_b)
 );
 
 reg [31:0] ram_write_data;
@@ -554,13 +571,14 @@ end
 wire [31:0] _ram_data;
 
 RAM ram(
-    .clk(clk),
-    .address(ram_addr[31:2]),
-    .q(ram_data),
+    .clock_a(clk),
+    .address_a(ram_addr[31:2]),
+    .q_a(ram_data),
     .byteena_a(ram_byteen),
-    .data(ram_write_data),
-    .wren(mem_wren),
-    .clk_b(clk_video),
+    .data_a(ram_write_data),
+    .wren_a(mem_wren),
+    .wren_b(1'b0),
+    .clock_b(clk_video),
     .address_b(vram_addr_mem),
     .q_b(vram_data)
 );
