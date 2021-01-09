@@ -498,30 +498,29 @@ PC pc(
 
 
 wire [31:0] vram_data;
-reg [3:0] vram_data_px;
+reg [7:0] vram_data_px;
 wire [9:0] v_x;
 wire [9:0] v_y;
 wire [19:0] vram_addr;
-wire [29:0] vram_addr_mem;
+wire [31:0] vram_addr_byte;
+wire [29:0] vram_addr_word;
 //vramのアドレス(0始まり)
-assign vram_addr = (v_y[8:0] * 320) + (v_x[8:0]);
+assign vram_addr = (v_y[9:1] * 320) + (v_x[9:1]);
 //メモリアクセス時のアドレス 1 + vram_addr(16bit) = 0x0001****
-//メモリへのアクセスは32bit(4byte)単位でアクセスするので、下4bitは切り捨てる
-assign vram_addr_mem = ({14'h1, vram_addr[18:3]});
+//メモリへのアクセスは32bit(4byte)単位でアクセスするので、下42bitは切り捨てる
+//VRAMは0x00010000から
+assign vram_addr_byte = {{16'h1, vram_addr[15:0]}};
+assign vram_addr_word = vram_addr_byte[31:2];
 
 
 //1pxは16色 4bitで表現する
 //VRAMのデータは4byte単位のアクセスなので、下4bitによって取り出す4bitを決める。
-always @(vram_addr[2:0]) begin
-    case(vram_addr[2:0])
-        3'b000: vram_data_px = vram_data[3:0];
-        3'b001: vram_data_px = vram_data[7:4];
-        3'b010: vram_data_px = vram_data[11:8];
-        3'b011: vram_data_px = vram_data[15:12];
-        3'b100: vram_data_px = vram_data[19:16];
-        3'b101: vram_data_px = vram_data[23:20];
-        3'b110: vram_data_px = vram_data[27:24];
-        3'b111: vram_data_px = vram_data[31:28];
+always @(vram_addr_byte[1:0]) begin
+    case(vram_addr_byte[1:0])
+        2'b00: vram_data_px = vram_data[31:24];
+        2'b01: vram_data_px = vram_data[23:16];
+        2'b10: vram_data_px = vram_data[15:8];
+        2'b11: vram_data_px = vram_data[7:0];
     endcase
 end
 
@@ -529,8 +528,8 @@ VGA vga(
     .reset_n(reset_n),
     .clk(clk_video),
     .col(vram_data_px),
-    .sync_h(sync_h),
-    .sync_v(sync_v),
+    .sync_h(vga_sync_h),
+    .sync_v(vga_sync_v),
     .v_x(v_x),
     .v_y(v_y),
     .r(vga_r),
@@ -579,7 +578,7 @@ RAM ram(
     .wren_a(mem_wren),
     .wren_b(1'b0),
     .clock_b(clk_video),
-    .address_b(vram_addr_mem),
+    .address_b(vram_addr_word),
     .q_b(vram_data)
 );
 

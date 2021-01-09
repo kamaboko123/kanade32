@@ -7,7 +7,7 @@
 module VGA(
     input reset_n,        //リセット(負論理)
     input clk,            //クロック(50MHz)
-    input [3:0] col,      //表示色
+    input [7:0] col,      //表示色
     output sync_h,        //水平同期信号
     output sync_v,        //垂直同期信号
     output reg[9:0] v_x,  //水平座標 (メモリアクセス用)

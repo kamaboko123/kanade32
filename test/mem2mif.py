@@ -1,6 +1,6 @@
 import sys
 
-MAX_MEMSIZE = 128 * 1024
+MAX_MEMSIZE = 256 * 1024
 MAX_MEMSIZE_WORD = int(MAX_MEMSIZE / 4)
 
 if __name__ == '__main__':
@@ -32,5 +32,5 @@ if __name__ == '__main__':
     for line in outlines:
         print("\t%s" % line)
     
-    print("\t[%d..%d] : 00000000;" % (cnt + 1, MAX_MEMSIZE_WORD - 1))
+    #print("\t[%d..%d] : 00000000;" % (cnt + 1, MAX_MEMSIZE_WORD - 1))
     print("END;")
