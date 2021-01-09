@@ -534,6 +534,43 @@
           "t2": "0x00000003"
         }
       }
+    },
+    {
+      "enable": true,
+      "mem": "test/asm/memdata/sra.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "t0": "0xffff0000",
+          "t1": "0xfffffc00"
+        }
+      }
+    },
+    {
+      "enable": true,
+      "mem": "test/asm/memdata/srav.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "t0": "0xffff0000",
+          "t1": "0x00000006",
+          "t2": "0xfffffc00"
+        }
+      }
+    },
+    {
+      "enable": true,
+      "mem": "test/asm/memdata/li.mem",
+      "clk": 100000,
+      "assert": {
+        "ignore_regs": [],
+        "registers": {
+          "t1": "0x00000011",
+          "t2": "0x00000022"
+        }
+      }
     }
   ]
 }

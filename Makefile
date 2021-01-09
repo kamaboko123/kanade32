@@ -17,8 +17,6 @@ $(VCD_FILE): $(OBJ)
 	$(VVP) $(OBJ) -v
 
 $(OBJ): $(V_FILES) $(MEM_FILES)
-	@echo $(V_FILES)
-	@echo $(MEM_FILES)
 	mkdir -p $(TARGET_DIR)
 	$(IVERILOGR) -o $(OBJ) -s $(TOP) -DTEST_MEM_FILE=\"$(MEM_FILE)\" -DSIM_CLK=$(SIM_CLK) $(V_FILES)
 

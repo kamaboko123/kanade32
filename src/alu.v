@@ -7,6 +7,9 @@ module ALU(
     output reg [63:0] x64
 );
 
+reg signed [31:0] signed_a;
+reg signed [31:0] signed_b;
+
 //wire _zero;
 //assign _zero = (x == 32'h0) ? 1 : 0;
 //assign zero = (op == `ALU_OP_SUB_NOT) ? ~_zero : _zero;
@@ -107,6 +110,14 @@ always @* begin
         end
         `ALU_OP_SRL: begin
             x = b >> a;
+        end
+        `ALU_OP_SRA: begin
+            signed_b = b;
+            x = signed_b >>> a;
+        end
+        `ALU_OP_SRA_IMM: begin
+            signed_a = a;
+            x = signed_a >>> b[10:6];
         end
         default: begin
             x64 = 64'b0;

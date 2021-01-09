@@ -188,6 +188,22 @@ always @* begin
                     reg_write = 1'b1;
                     alu_op = `ALU_OP_SRL;
                 end
+                //sra
+                6'b000011: begin
+                    alu_src_a = `ALU_SRC_A_RT;
+                    alu_src_b = `ALU_SRC_B_IMM;
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_SRA_IMM;
+                end
+                //srav
+                6'b000111: begin
+                    alu_src_a = `ALU_SRC_A_RS;
+                    alu_src_b = `ALU_SRC_B_RT;
+                    reg_dst = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = `ALU_OP_SRA;
+                end
             endcase
         end
         //blt

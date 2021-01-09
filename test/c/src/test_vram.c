@@ -5,7 +5,7 @@
 uint8_t *vram = (uint8_t *)VRAM_BASE;
 
 void point(uint32_t x, uint32_t y, uint8_t col) {
-    uint32_t v_addr = ((y * VIDEO_MAX_X) + x >> 1);
+    uint32_t v_addr = (((y * VIDEO_MAX_X) + x) >> 1);
     uint32_t byte_selector = x & 0x01;
     uint32_t mask = 0x0F << (byte_selector * 4);
     uint32_t _col = col & 0x0F;
@@ -21,6 +21,9 @@ void clear_vram() {
 }
 
 int mips_main() {
+    point(2, 0, 0x01);
+    return (vram[1]);
+    /*
     clear_vram();
     for (int x = 0; x < VIDEO_MAX_X; x++) {
         for (int y = 0; y < VIDEO_MAX_Y; y++) {
@@ -29,4 +32,5 @@ int mips_main() {
         }
     }
     return (vram[0]);
+    */
 }

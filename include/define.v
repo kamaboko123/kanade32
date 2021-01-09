@@ -26,6 +26,8 @@
 `define ALU_OP_SRL_IMM 5'b01111
 `define ALU_OP_SLL 5'b10000
 `define ALU_OP_SRL 5'b10001
+`define ALU_OP_SRA 5'b10010
+`define ALU_OP_SRA_IMM 5'b10011
 
 `define ALU_SRC_A_RS 1'b0
 `define ALU_SRC_A_RT 1'b1

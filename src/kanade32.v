@@ -111,7 +111,7 @@ wire [31:0] em_imm_sign_extend;
 always @* begin
     case(em_alu_src_a)
         `ALU_SRC_A_RS: begin
-            em_data0 = em_reg0; //rt
+            em_data0 = em_reg0; //rs
         end
         `ALU_SRC_A_RT: begin
             em_data0 = em_reg1;
