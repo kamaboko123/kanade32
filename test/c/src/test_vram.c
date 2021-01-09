@@ -2,9 +2,9 @@
 
 #include "vram.h"
 
-uint8_t *vram = (uint8_t *)VRAM_BASE;
-
 void point(uint32_t x, uint32_t y, uint8_t col) {
+    uint8_t *vram = (uint8_t *)VRAM_BASE;
+
     uint32_t v_addr = (((y * VIDEO_MAX_X) + x) >> 1);
     uint32_t byte_selector = x & 0x01;
     uint32_t mask = 0x0F << (byte_selector * 4);
@@ -15,14 +15,17 @@ void point(uint32_t x, uint32_t y, uint8_t col) {
 }
 
 void clear_vram() {
+    uint8_t *vram = (uint8_t *)VRAM_BASE;
+
     for (int i = 0; i < VIDEO_MAX_X * VIDEO_MAX_Y / 2; i++) {
         vram[i] = 0;
     }
 }
 
-int mips_main() {
-    point(2, 0, 0x01);
-    return (vram[1]);
+uint32_t mips_main() {
+    uint8_t *vram = (uint8_t *)VRAM_BASE;
+    point(318, 2, 0x01);
+    return (vram[479]);
     /*
     clear_vram();
     for (int x = 0; x < VIDEO_MAX_X; x++) {

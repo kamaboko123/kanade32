@@ -12,7 +12,7 @@ module RAM(
 );
 
 reg [29:0] _address_a;
-reg [31:0] _ram [32767:0];
+reg [31:0] _ram [65535:0];
 reg [29:0] _address_b;
 
 wire [31:0] mask_a;
