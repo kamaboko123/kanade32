@@ -52,20 +52,37 @@ wire mem_fetch;
 
 assign sync_h = !(h_pos >= SYNC_H_START && h_pos < SYNC_H_END);
 assign sync_v = !(v_pos >= SYNC_V_START && v_pos < SYNC_V_END);
-assign next_fetch_h = (h_pos + 1 >= BACK_PORCH_H && h_pos + 1 < BACK_PORCH_H + SIZE_H);
-assign next_fetch_v = (v_pos >= BACK_PORCH_V && v_pos < BACK_PORCH_V + SIZE_V);
-assign mem_fetch = (next_fetch_h && next_fetch_v);
+//assign next_fetch_h = (h_pos + 1 >= BACK_PORCH_H && h_pos + 1 < BACK_PORCH_H + SIZE_H);
 
 wire H_END;
 assign H_END = (h_pos == H_MAX - 1);
 wire V_END;
 assign V_END = (v_pos == V_MAX - 1);
 
+assign next_fetch_h = (h_pos + 2 >= BACK_PORCH_H && h_pos + 1 < BACK_PORCH_H + SIZE_H);
+assign next_fetch_v = (v_pos >= BACK_PORCH_V && v_pos < BACK_PORCH_V + SIZE_V);
+assign mem_fetch = (next_fetch_h && next_fetch_v);
 
-always @(mem_fetch or h_pos or v_pos or col) begin
+wire display_h;
+wire display_v;
+wire display;
+
+assign display_h = (h_pos >= BACK_PORCH_H && h_pos + 2 < BACK_PORCH_H + SIZE_H);
+assign display_v = (v_pos >= BACK_PORCH_V && v_pos < BACK_PORCH_V + SIZE_V);
+assign display = (display_h && display_v);
+
+
+always @* begin
 	if(mem_fetch) begin
-		v_x = h_pos - BACK_PORCH_H + 1;
+		v_x = h_pos - BACK_PORCH_H + 2;
 		v_y = v_pos - BACK_PORCH_V;
+    end
+    else begin
+        v_x = 0;
+        v_y = 0;
+    end
+
+	if(display) begin
 		if(col == 0) begin
 			r = 0;
 			g = 0;
@@ -76,14 +93,12 @@ always @(mem_fetch or h_pos or v_pos or col) begin
 			g = 15;
 			b = 15;
 		end
-    end
-    else begin
-        v_x = 0;
-        v_y = 0;
-		  r = 0;
-		  g = 0;
-		  b = 0;
-    end
+	end
+	else begin
+		r = 0;
+		g = 0;
+		b = 0;
+	end
 end
 
 //horizontal pos

@@ -7,7 +7,7 @@ OBJ = $(addprefix $(TARGET_DIR)/, $(notdir $(SRC:.asm=.o)))
 BIN = $(addprefix $(TARGET_DIR)/, $(notdir $(SRC:.asm=.bin)))
 MEM = $(addprefix $(MEMDATA_DIR)/, $(notdir $(SRC:.asm=.mem)))
 ASFLAGS = -mips1 -O0 --no-break --no-trap
-MEMFILE_LENGTH_WORD = 32768 # 128KB / 4 byte
+MEMFILE_LENGTH_WORD = 65535 # 128KB / 4 byte
 
 .SECONDARY: $(BIN) $(OBJ)
 

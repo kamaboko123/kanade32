@@ -501,15 +501,13 @@ wire [31:0] vram_data;
 reg [7:0] vram_data_px;
 wire [9:0] v_x;
 wire [9:0] v_y;
-wire [19:0] vram_addr;
+wire [31:0] vram_addr;
 wire [31:0] vram_addr_byte;
 wire [29:0] vram_addr_word;
 //vramのアドレス(0始まり)
 assign vram_addr = (v_y[9:1] * 320) + (v_x[9:1]);
-//メモリアクセス時のアドレス 1 + vram_addr(16bit) = 0x0001****
-//メモリへのアクセスは32bit(4byte)単位でアクセスするので、下42bitは切り捨てる
 //VRAMは0x00010000から
-assign vram_addr_byte = {{16'h1, vram_addr[15:0]}};
+assign vram_addr_byte = 32'h00010000 + vram_addr;
 assign vram_addr_word = vram_addr_byte[31:2];
 
 
