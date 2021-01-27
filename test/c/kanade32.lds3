@@ -1,0 +1,15 @@
+SECTIONS
+{
+    .header 0x0:{
+        LONG(start)       /* エントリアドレス */
+        LONG(4 * 0x1000)  /* スタック領域 */
+    }
+    .text : {
+        *(.text)
+        *(.data)
+        *(.bss)
+        *(.rodata)
+        . = 0x40000;
+    }
+    /DISCARD/ : { *(*)}
+}

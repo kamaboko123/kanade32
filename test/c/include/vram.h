@@ -1,3 +1,0 @@
-#define VRAM_BASE 0x00010000
-#define VIDEO_MAX_X 320
-#define VIDEO_MAX_Y 240
